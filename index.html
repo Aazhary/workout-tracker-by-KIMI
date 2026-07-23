@@ -1,0 +1,642 @@
+
+# Write the complete HTML file directly using Python
+# We'll write it in chunks to avoid the JSON parsing issue
+
+header = '''<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Workout">
+    <meta name="theme-color" content="#0a0f1a">
+    <title>Workout Tracker — أحمد</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2548/2548530.png">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+        body { background-color: #0a0f1a; color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; overscroll-behavior-y: none; }
+        input, select, textarea { -webkit-appearance: none; }
+        .safe-top { padding-top: env(safe-area-inset-top); }
+        .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #0a0f1a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        .exercise-gif { width: 100%; max-width: 280px; height: 200px; object-fit: contain; border-radius: 12px; background: #0f172a; margin: 0 auto; display: block; }
+        .exercise-gif-loading { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+'''
+
+print(f"Header length: {len(header)}")
+print("Header ready")
+
+# Write the complete file using a different approach - write directly to file
+# Using triple quotes carefully to avoid JSON issues
+
+with open('/mnt/agents/output/workout_tracker_enhanced.html', 'w', encoding='utf-8') as f:
+    f.write('''<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Workout">
+    <meta name="theme-color" content="#0a0f1a">
+    <title>Workout Tracker — أحمد</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2548/2548530.png">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+        body { background-color: #0a0f1a; color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; overscroll-behavior-y: none; }
+        input, select, textarea { -webkit-appearance: none; }
+        .safe-top { padding-top: env(safe-area-inset-top); }
+        .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #0a0f1a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        .exercise-gif { width: 100%; max-width: 280px; height: 200px; object-fit: contain; border-radius: 12px; background: #0f172a; margin: 0 auto; display: block; }
+        .exercise-gif-loading { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+''')
+
+print("Part 1 written successfully")
+
+# Continue writing the JavaScript part - Exercise GIFs and Config
+with open('/mnt/agents/output/workout_tracker_enhanced.html', 'a', encoding='utf-8') as f:
+    f.write('''        const { useState, useEffect, useRef, useCallback } = React;
+
+        // EXERCISE GIF DATABASE
+        const EXERCISE_GIFS = {
+            "Incline Chest Press": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/0c1a4192b8140fe5f80ef563c4af1fbcab216ed9.gif",
+            "Flat Chest Press": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/5b9898742548d64dc91860d5399c601aefdab9d1.gif",
+            "Assisted Chin-Up": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/4b2f8c91d1ae0f5e8ef5d6e309693e68c3000610.gif",
+            "Chest Fly": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/59dc73937662ab45d931cae8b766a5b9e3bbcbc4.gif",
+            "Leg Press": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/c8c424bed80d9c428e70287aeb3059e1da8a485a.gif",
+            "Hack Squat": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/0c1a4192b8140fe5f80ef563c4af1fbcab216ed9.gif",
+            "Shoulder Press": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/9ebc107555e861ad60c675cd8dc372c1e60b2f58.gif",
+            "Seated Side Raises": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/0959321662715b42ebe3a6784a2cffb5c5c180c6.gif",
+            "Seated Leg Curl": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/a1a6885400ccd48312e4d3bc7a12a8b2438e9c4c.gif",
+            "Triceps Press": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/6002b8f2311e58d8b2aaa83e4c391a36fc5c867e.gif",
+            "Incline Biceps Curl": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/2743043ed295dd88f1c296f7c6f5b677d1d060b9.gif",
+            "Abs Crunch": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/91ec56102f5222f83d938161d14c7efaaea79d15.gif",
+            "Plank": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/a41d1be7eac18730836eeca9fabdfdf958c0d46a.gif",
+            "T-Bar Row": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/88dee93a1e996e287548f140945c4dfb230db6c9.gif",
+            "Chest Supported Row": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/ae74f98d00006026401f167e32802721f2a37420.gif",
+            "Cable Rear Delt Fly": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/e47639981d6dc1b2c4a3be60312fce2a578d6728.gif",
+            "Triceps Pushdown": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/6002b8f2311e58d8b2aaa83e4c391a36fc5c867e.gif",
+            "Alternating Curl (Preacher)": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/28624734c8e17f81706dc4bd9520b50f1e90ff12.gif",
+            "Side Plank": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/a41d1be7eac18730836eeca9fabdfdf958c0d46a.gif",
+            "Leg Curl": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/a1a6885400ccd48312e4d3bc7a12a8b2438e9c4c.gif",
+        };
+
+        const DEFAULT_PROFILE = { name: "احمد", weight: 86.5, muscle: 61.6, fat: 21.4, visceralFat: 12, age: 38, dose: "Mounjaro 5mg", restSeconds: 90, rpeEnabled: true };
+
+        const DEFAULT_WORKOUTS = {
+            "Upper 1": [
+                { name:"Incline Chest Press", type:"reps", unit:"lb", startWeight:55, presets:[{w:55,r:12},{w:66,r:10}], muscles:"رئيسي: صدر علوي (Upper Pec) | مساعد: كتف امامي + ترايسبس", safety:"ضهرك ملصوق بالكرسي طول الوقت", tips:["ضهرك ملصوق بالكرسي","نزل ببطء 3 ثواني، ارفع بقوة","مرفقيك مش فارد 100% فوق","زاوية 30-45° مش 90°"], cue:"زاوية 45° — صدر علوي", rpe:7 },
+                { name:"Assisted Chin-Up", type:"reps", unit:"lb", startWeight:40, presets:[{w:40,r:10},{w:33,r:8}], muscles:"رئيسي: ظهر عريض (Lats) + بايسبس | مساعد: ظهر علوي + ساعد", safety:"متارجحش — الحركة من الكتف مش من الوسط", tips:["الوزن المساعد اكتر = اسهل","اسحب لحد ما ذقنك فوق البار","نزل ببطء — ده الجزء المهم"], cue:"ظهر وبايسبس", rpe:8 },
+                { name:"Chest Fly", type:"reps", unit:"lb", startWeight:99, presets:[{w:99,r:12},{w:110,r:12}], muscles:"رئيسي: صدر كامل (Pectoralis Major)", safety:"مرفقيك منحنيين دايماً", tips:["مرفقيك منحنيين بسيط طول الوقت","حس بالشد في منتصف الصدر"], cue:"فراشة — عزل الصدر", rpe:7 },
+                { name:"Shoulder Press", type:"reps", unit:"lb", startWeight:17.5, presets:[{w:17.5,r:12},{w:20,r:10}], muscles:"رئيسي: كتف امامي + كتف جانبي", safety:"وزن مأمن مهم جداً — مفصل الكتف محتاج حماية", tips:["وزن مأمن لحماية مفصل الكتف","شد بطنك طول الوقت"], cue:"اكتاف — حماية المفصل اولى", rpe:7 },
+                { name:"Seated Side Raises", type:"reps", unit:"kg", startWeight:10, presets:[{w:10,r:12},{w:10,r:12}], muscles:"رئيسي: كتف جانبي (Lateral Delt)", safety:"متحركش جسمك — لو بتارجح يبقى الوزن تقيل", tips:["ارفع للجانب مش للامام","الكوع يسبق الرسغ قليلاً"], cue:"جانبي — عرض الكتف", rpe:8 },
+            ],
+            "Lower 1": [
+                { name:"Leg Press", type:"reps", unit:"kg", startWeight:50, presets:[{w:50,r:12},{w:85,r:10}], muscles:"رئيسي: كوادريسبس (Quads) | مساعد: غلوت + هامسترينج", safety:"متقفلش ركبتك فوق — وخليها مش بتتعدى الصابع", tips:["رجليك متاعدين على العرض","انزل لـ 90 درجة بس","متقفلش ركبتك فوق"], cue:"ضغط ارجل — كوادريسبس", rpe:8 },
+                { name:"Seated Leg Curl", type:"reps", unit:"lb", startWeight:55, presets:[{w:55,r:12},{w:65,r:10}], muscles:"رئيسي: هامسترينج (Hamstrings)", safety:"متزنكش على الجهاز — ده بيشيل الحمل من العضلة", tips:["ببطء في الرجوع — ده الجزء المهم","متزنكش على الجهاز"], cue:"هامسترينج", rpe:8 },
+                { name:"Triceps Press", type:"reps", unit:"lb", startWeight:22, presets:[{w:22,r:12},{w:24,r:10}], muscles:"رئيسي: ترايسبس (Triceps)", safety:"كوعيك ثابتين — لو تحركوا يبقى الوزن تقيل", tips:["افرد الدراع كاملة","نزل ببطء"], cue:"تمديد ترايسبس", rpe:7 },
+                { name:"Incline Biceps Curl", type:"reps", unit:"lb", startWeight:44, presets:[{w:44,r:12},{w:55,r:12}], muscles:"رئيسي: بايسبس (Biceps)", safety:"متتحركش عن الدكة — المرجحة بتضيع التمرين", tips:["الضهر مستوي على الدكة المائلة","نزل ببطء كامل"], cue:"بايسبس — اقوى عزل", rpe:7 },
+                { name:"Abs Crunch", type:"reps", unit:"lb", startWeight:35, presets:[{w:35,r:25},{w:40,r:20}], muscles:"رئيسي: بطن علوي (الزامي للبطن والكور)", safety:"الحركة من الاكتاف بس", tips:["مش بترفع جسمك كله — بس الاكتاف","زفير وانت بتطلع"], cue:"بطن علوي — الزامي", rpe:8 },
+                { name:"Plank", type:"time", unit:null, startWeight:null, presets:[{target:"45s"},{target:"45s"}], muscles:"رئيسي: كور كامل (الزامي للكور)", safety:"جسمك خط مستقيم تماماً — ممنوع التخطي", tips:["جسمك خط مستقيم من راسك لكعبك","بطنك جوا طول الوقت"], cue:"ثبات 45 ثانية — الزامي", rpe:9 },
+            ],
+            "Upper 2": [
+                { name:"Flat Chest Press", type:"reps", unit:"lb", startWeight:35, presets:[{w:35,r:12},{w:45,r:8}], muscles:"رئيسي: صدر وسط (Pec Major)", safety:"نزل لحد ما الكوع 90° بس — مش اكتر عشان القطنية", tips:["تحكم في المدى الحركي","ضهرك ملصوق بالكرسي"], cue:"بنش مستوي — صدر وسط", rpe:8 },
+                { name:"Chest Fly", type:"reps", unit:"lb", startWeight:110, presets:[{w:110,r:12},{w:110,r:12}], muscles:"رئيسي: صدر كامل", safety:"مرفقيك منحنيين دايماً", tips:["ركز على الشد في منتصف الصدر"], cue:"فراشة — عزل الصدر", rpe:7 },
+                { name:"T-Bar Row", type:"reps", unit:"kg", startWeight:25, presets:[{w:25,r:12},{w:35,r:10}], muscles:"رئيسي: ظهر وسط + Rhomboids", safety:"صدرك على المسند طول الوقت — لو ارتفع يبقى الوزن تقيل", tips:["صدرك على المسند طول الوقت","اسحب للحزام — مش للذقن"], cue:"سحب T — ظهر علوي", rpe:8 },
+                { name:"Chest Supported Row", type:"reps", unit:"lb", startWeight:35, presets:[{w:35,r:12},{w:55,r:10}], muscles:"رئيسي: ظهر وسط (Mid Back)", safety:"صدرك على الدكة مش بترفعه — ده بيحمي القطنية", tips:["مرفقيك بيجوا للخلف — مش للجانب"], cue:"سحب بمسند — ظهر وسط", rpe:8 },
+                { name:"Seated Side Raises", type:"reps", unit:"lb", startWeight:12, presets:[{w:12,r:10},{w:10,r:12}], muscles:"رئيسي: كتف جانبي", safety:"مش بتارجح جسمك دايماً", tips:["الكوع فوق الرسغ دايماً"], cue:"جانبي — عرض الكتف", rpe:8 },
+                { name:"Cable Rear Delt Fly", type:"reps", unit:"lb", startWeight:12, presets:[{w:12,r:10},{w:10,r:12}], muscles:"رئيسي: كتف خلفي (Rear Delt)", safety:"الوزن مش مهم هنا — الاستشعار بالعضلة هو الهدف", tips:["انحن للامام قليلاً","نزل ببطء"], cue:"كتف خلفي", rpe:7 },
+            ],
+            "Lower 2": [
+                { name:"Hack Squat", type:"reps", unit:"kg", startWeight:40, presets:[{w:40,r:12},{w:70,r:11}], muscles:"رئيسي: كوادريسبس + غلوت", safety:"ظهرك ملصوق بالجهاز طول الوقت — لو انفصل وقف فوراً", tips:["ظهرك ملصوق بالجهاز طول الوقت","انزل لـ 90 درجة بالظبط"], cue:"هاك سكوات — كوادريسبس + غلوت", rpe:8 },
+                { name:"Leg Curl", type:"reps", unit:"lb", startWeight:65, presets:[{w:65,r:12},{w:70,r:10}], muscles:"رئيسي: هامسترينج", safety:"التحكم اهم من الوزن", tips:["تحكم في الحركة للاسفل","شايل ثانية فوق"], cue:"هامسترينج", rpe:8 },
+                { name:"Triceps Pushdown", type:"reps", unit:"lb", startWeight:20, presets:[{w:20,r:12},{w:22,r:12}], muscles:"رئيسي: ترايسبس", safety:"كوعيك ثابتين جنب جسمك", tips:["افرد الدراع كاملة للاسفل"], cue:"ترايسبس كابل", rpe:7 },
+                { name:"Alternating Curl (Preacher)", type:"reps", unit:"kg", startWeight:7.5, presets:[{w:7.5,r:12},{w:10,r:12}], muscles:"رئيسي: بايسبس", safety:"بدون مرجحة لتفادي اجهاد الجهاز العصبي", tips:["كل دراع لوحدها","نزل ببطء كامل"], cue:"بايسبس متناوب", rpe:7 },
+                { name:"Side Plank", type:"time", unit:null, startWeight:null, presets:[{target:"55s"},{target:"55s"}], muscles:"رئيسي: كور جانبي (الزامي للكور)", safety:"ورك مرفوع دايماً — ممنوع التخطي", tips:["جسمك خط مستقيم"], cue:"ثبات 55 ثانية — الزامي", rpe:9 },
+                { name:"Abs Crunch", type:"reps", unit:"lb", startWeight:35, presets:[{w:35,r:25},{w:40,r:20}], muscles:"رئيسي: بطن علوي (الزامي للبطن)", safety:"الحركة صغيرة ومركزة لمنع التخطي وعصر العضلة", tips:["الحركة من الصدر لفوق بس","زفير وانت بتطلع"], cue:"بطن — الزامي", rpe:8 },
+            ],
+        };
+
+        const C = {
+            "Upper 1":{ bg:"#1e3a5f", accent:"#3b82f6", emoji:"💪" },
+            "Lower 1":{ bg:"#14532d", accent:"#22c55e", emoji:"🦵" },
+            "Upper 2":{ bg:"#3b0764", accent:"#a855f7", emoji:"🏋️" },
+            "Lower 2":{ bg:"#7c2d12", accent:"#f97316", emoji:"🔥" },
+        };
+
+        const TODAY_ISO = new Date().toISOString().split("T")[0];
+        const TODAY_AR = new Date().toLocaleDateString("ar-EG",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+
+        // STORAGE
+        const getStorage = () => { try{ return JSON.parse(localStorage.getItem("wt_ahmed_v5")||"[]"); }catch{ return []; } };
+        const saveStorage = d => { try{ localStorage.setItem("wt_ahmed_v5", JSON.stringify(d)); }catch{} };
+        const getProfile = () => { try{ return JSON.parse(localStorage.getItem("wt_profile_v2")||"null"); }catch{ return null; } };
+        const saveProfile = p => { try{ localStorage.setItem("wt_profile_v2", JSON.stringify(p)); }catch{} };
+        const getCustomWorkouts = () => { try{ const s = localStorage.getItem("wt_custom_workouts_v2"); return s ? JSON.parse(s) : DEFAULT_WORKOUTS; }catch{ return DEFAULT_WORKOUTS; } };
+        const saveCustomWorkouts = w => { try{ localStorage.setItem("wt_custom_workouts_v2", JSON.stringify(w)); }catch{} };
+
+        // VOLUME CALCULATION with kg/lb conversion
+        const KG_TO_LB = 2.20462;
+        const calcVolume = exercises => exercises.reduce((t, ex) => {
+            if(ex.type !== "reps") return t;
+            return t + ex.sets.reduce((s, set) => {
+                const w = parseFloat(set.weight) || 0;
+                const r = parseInt(set.reps) || 0;
+                const normalizedWeight = set.unit === "lb" ? w * KG_TO_LB : w;
+                return s + (normalizedWeight * r);
+            }, 0);
+        }, 0);
+        const formatVolume = vol => vol > 0 ? Math.round(vol).toLocaleString() + " kg·eq" : "—";
+
+        const initSets = exercises => exercises.map(ex => ({
+            name: ex.name, type: ex.type, unit: ex.unit, startWeight: ex.startWeight,
+            cue: ex.cue, tips: ex.tips, muscles: ex.muscles, safety: ex.safety, rpe: ex.rpe,
+            sets: (ex.presets || [{},{}]).map(pre =>
+                ex.type === "time"
+                    ? { duration: pre.duration || "", targetDuration: pre.target || "", done: false, rpe: null }
+                    : { weight: String(pre.w != null ? pre.w : ex.startWeight || ""), unit: ex.unit || "kg", reps: String(pre.r != null ? pre.r : ""), done: false, rpe: null }
+            ),
+        }));
+''')
+
+print("Part 2 written successfully")
+
+# Continue writing - Audio Manager and Prompt Builder
+with open('/mnt/agents/output/workout_tracker_enhanced.html', 'a', encoding='utf-8') as f:
+    f.write('''
+        // AUDIO SYSTEM - iOS Safari Compatible with Vibration Fallback
+        class AudioManager {
+            constructor() { this.ctx = null; this.initialized = false; }
+            init() {
+                if (this.initialized && this.ctx && this.ctx.state !== "closed") return true;
+                try {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (!AudioCtx) return false;
+                    this.ctx = new AudioCtx();
+                    this.initialized = true;
+                    if (this.ctx.state === "suspended") this.ctx.resume();
+                    return true;
+                } catch (e) { return false; }
+            }
+            ensureRunning() {
+                if (!this.ctx) this.init();
+                if (this.ctx && this.ctx.state === "suspended") this.ctx.resume();
+                return this.ctx && this.ctx.state === "running";
+            }
+            playBeep(freq, dur, vol) {
+                if (!this.ensureRunning()) { this.vibrate(50); return; }
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.connect(gain); gain.connect(this.ctx.destination);
+                    osc.frequency.value = freq || 880;
+                    gain.gain.setValueAtTime(vol || 0.5, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + (dur || 0.15));
+                    osc.start(this.ctx.currentTime); osc.stop(this.ctx.currentTime + (dur || 0.15));
+                } catch (e) { this.vibrate(50); }
+            }
+            playDone() {
+                if (!this.ensureRunning()) { this.vibrate([100,50,100,50,200]); return; }
+                try {
+                    [[0,880],[0.2,1047],[0.4,1319]].forEach(([t,freq]) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.connect(gain); gain.connect(this.ctx.destination);
+                        osc.frequency.value = freq;
+                        gain.gain.setValueAtTime(0.5, this.ctx.currentTime + t);
+                        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + t + 0.4);
+                        osc.start(this.ctx.currentTime + t); osc.stop(this.ctx.currentTime + t + 0.45);
+                    });
+                } catch (e) { this.vibrate([100,50,100,50,200]); }
+            }
+            playCountdown(seconds) {
+                if (seconds <= 5) this.playBeep(1047, 0.12, 0.6);
+                else if (seconds <= 10) this.playBeep(880, 0.1, 0.4);
+            }
+            vibrate(pattern) { if (navigator.vibrate) navigator.vibrate(pattern); }
+        }
+        const audioManager = new AudioManager();
+
+        // PROMPT BUILDER
+        function buildPrompt(session, history, profile) {
+            const p = profile || DEFAULT_PROFILE;
+            const prev = history.filter(h => h.workout === session.workout).slice(-2)[0] || null;
+            const vol = calcVolume(session.exercises);
+            const mins = session.durationMins || "—";
+            const lines = [];
+            lines.push("انا احمد، " + p.age + " سنة، مستمر على الـ " + p.dose + ".");
+            lines.push("إليك التقرير البرمجي الصافي والمحدث لتمرينة اليوم، والمطلوب منك تحليله ومقارنته بالجلسة السابقة ومطابقته مع لقطات شاشة الساعة المرفقة:");
+            lines.push("");
+            lines.push("1. [بيانات الجلسة الحالية]:");
+            lines.push("• اسم الجلسة: " + session.workout);
+            lines.push("• التاريخ: " + session.date);
+            lines.push("• الوقت الإجمالي للتمرين: " + mins + " دقيقة");
+            lines.push("• إجمالي الحجم التدريبي (Total Volume): " + formatVolume(vol));
+            lines.push("");
+            lines.push("2. [سجل الأداء الفعلي للمجموعتين] — مع تقييم RPE (1-10):");
+            session.exercises.forEach(ex => {
+                if (ex.type === "reps") {
+                    const s1 = ex.sets[0]; const s2 = ex.sets[1] || {};
+                    const u1 = s1.unit || ""; const u2 = s2.unit || u1;
+                    lines.push("• " + ex.name + " (RPE هدف: " + (ex.rpe || "—") + "):");
+                    lines.push("  جولة 1: " + (s1.weight || "—") + u1 + " × " + (s1.reps || "—") + " عدات " + (s1.rpe ? "[RPE " + s1.rpe + "]" : "") + " " + (s1.done ? "✅" : "⬜"));
+                    lines.push("  جولة 2: " + (s2.weight || "—") + u2 + " × " + (s2.reps || "—") + " عدات " + (s2.rpe ? "[RPE " + s2.rpe + "]" : "") + " " + (s2.done ? "✅" : "⬜"));
+                } else {
+                    lines.push("• " + ex.name + ":");
+                    ex.sets.forEach((s, i) => lines.push("  جولة " + (i + 1) + ": " + (s.duration || "—") + " " + (s.rpe ? "[RPE " + s.rpe + "]" : "") + " " + (s.done ? "✅" : "⬜")));
+                }
+            });
+            lines.push("");
+            lines.push("3. [بيانات الاستشفاء والساعة]:");
+            lines.push("  (مرفق لقطات الشاشة للساعة بالأسفل لقراءتها وتحليل جودة النوم، الـ REM، نبضات التمرين، ومعدل التعافي).");
+            lines.push("");
+            lines.push("4. [المطلوب منك كـ AI مدرب]:");
+            lines.push("  - تقييم الشدة والتطور");
+            lines.push("  - مقارنة دقيقة بالجلسة السابقة");
+            lines.push("  - اقتراح أوزان للجلسة القادمة بصيغة واضحة");
+            lines.push("  - نصائح تغذية واستشفاء مخصصة");
+            lines.push("  - لو فيه تمرين مؤلم أو صعب جداً، اقترح بديل مناسب");
+            return lines.join("\\n");
+        }
+
+        // EXPORT / BACKUP
+        function exportData() {
+            const data = { profile: getProfile() || DEFAULT_PROFILE, workouts: getCustomWorkouts(), history: getStorage(), exportDate: new Date().toISOString(), version: "5.0" };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a"); a.href = url; a.download = "workout_backup_" + TODAY_ISO + ".json";
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+        function importData(jsonText) {
+            try {
+                const data = JSON.parse(jsonText);
+                if (data.profile) saveProfile(data.profile);
+                if (data.workouts) saveCustomWorkouts(data.workouts);
+                if (data.history) saveStorage(data.history);
+                return { success: true, count: data.history ? data.history.length : 0 };
+            } catch (e) { return { success: false, error: e.message }; }
+        }
+''')
+
+print("Part 3 written successfully")
+
+# Continue writing - ExerciseGif component and GeminiSyncScreen
+with open('/mnt/agents/output/workout_tracker_enhanced.html', 'a', encoding='utf-8') as f:
+    f.write('''
+        // EXERCISE GIF COMPONENT
+        function ExerciseGif({ name, accent }) {
+            const [loaded, setLoaded] = useState(false);
+            const [error, setError] = useState(false);
+            const gifUrl = EXERCISE_GIFS[name];
+            if (!gifUrl) {
+                return React.createElement("div", { style: {width:"100%",maxWidth:280,height:200,background:"#0f172a",borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto",border:"1px solid " + accent + "22"} },
+                    React.createElement("span", { style: {fontSize:48} }, "🏋️")
+                );
+            }
+            return React.createElement("div", { style: {position:"relative",width:"100%",maxWidth:280,margin:"0 auto"} },
+                !loaded && React.createElement("div", { className: "exercise-gif-loading", style: {position:"absolute",top:0,left:0,right:0,bottom:0,borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center"} },
+                    React.createElement("span", { style: {color:"#64748b",fontSize:12} }, "جاري التحميل...")
+                ),
+                React.createElement("img", { src: gifUrl, alt: name, className: "exercise-gif", style: {opacity: loaded ? 1 : 0, transition: "opacity 0.3s"}, onLoad: () => setLoaded(true), onError: () => setError(true) }),
+                error && React.createElement("div", { style: {position:"absolute",top:0,left:0,right:0,bottom:0,background:"#0f172a",borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",border:"1px solid " + accent + "22"} },
+                    React.createElement("span", { style: {fontSize:48} }, "🏋️")
+                )
+            );
+        }
+
+        // GEMINI SYNC SCREEN
+        function GeminiSyncScreen({onBack}) {
+            const [text, setText] = useState("");
+            const [status, setStatus] = useState("");
+            const [parsed, setParsed] = useState([]);
+
+            const parseGeminiText = useCallback((txt) => {
+                const results = [];
+                const patterns = [
+                    /([A-Za-z\s()]+)[\s:：]+(?:جولة\s*1[\s:：]+)?(\d+(?:\.\d+)?)\s*(kg|lb)?\s*[×xX]\s*(\d+)/gi,
+                    /([A-Za-z\s()]+)[\s-]+(\d+(?:\.\d+)?)\s*(kg|lb)?\s*[×xX]\s*(\d+)/gi,
+                ];
+                patterns.forEach(pattern => {
+                    let match;
+                    while ((match = pattern.exec(txt)) !== null) {
+                        const exName = match[1].trim();
+                        const weight = parseFloat(match[2]);
+                        const unit = match[3] || "kg";
+                        const reps = parseInt(match[4]);
+                        if (exName && weight && reps) {
+                            results.push({ name: exName, weight, unit, reps });
+                        }
+                    }
+                });
+                return results;
+            }, []);
+
+            const handleSync = () => {
+                if (!text.trim()) return;
+                const parsedResults = parseGeminiText(text);
+                setParsed(parsedResults);
+                if (parsedResults.length === 0) {
+                    setStatus("❌ لم يتم العثور على أوزان متطابقة. تأكد من نسخ اقتراح Gemini كاملاً.");
+                    return;
+                }
+                try {
+                    const currentWorkouts = {...getCustomWorkouts()};
+                    let updatedCount = 0;
+                    Object.keys(currentWorkouts).forEach(workoutKey => {
+                        currentWorkouts[workoutKey] = currentWorkouts[workoutKey].map(exercise => {
+                            const match = parsedResults.find(p => 
+                                p.name.toLowerCase().includes(exercise.name.toLowerCase()) ||
+                                exercise.name.toLowerCase().includes(p.name.toLowerCase())
+                            );
+                            if (match) {
+                                updatedCount++;
+                                return { ...exercise, startWeight: match.weight, presets: [{w: match.weight, r: match.reps}, {w: Math.round(match.weight * 1.1 * 10) / 10, r: Math.max(match.reps - 2, 6)}] };
+                            }
+                            return exercise;
+                        });
+                    });
+                    saveCustomWorkouts(currentWorkouts);
+                    setStatus("✅ نجاح! تم تحديث " + updatedCount + " تمرين بأوزانك الجديدة.");
+                    setTimeout(onBack, 2000);
+                } catch (e) { setStatus("❌ حدث خطأ: " + e.message); }
+            };
+
+            return React.createElement("div", { className: "min-h-screen text-right p-4 safe-top safe-bottom", style: {background:"#0a0f1a"} },
+                React.createElement("div", { className: "flex justify-between items-center border-b border-gray-800 pb-4 mb-6" },
+                    React.createElement("h2", { className: "text-xl font-bold text-blue-500" }, "🤖 مزامنة الأوزان من Gemini"),
+                    React.createElement("button", { onClick: onBack, className: "bg-gray-800 px-3 py-1.5 rounded-lg text-sm text-gray-400" }, "إغلاق")
+                ),
+                React.createElement("div", { className: "bg-blue-950/30 border border-blue-900 rounded-xl p-3 mb-4" },
+                    React.createElement("p", { className: "text-blue-400 text-xs leading-relaxed" }, "📋 انسخ رد Gemini هنا. الكود بيدعم صيغ متعددة: Exercise: 50kg × 12")
+                ),
+                React.createElement("textarea", { value: text, onChange: e => { setText(e.target.value); setParsed(parseGeminiText(e.target.value)); }, placeholder: "الصق نص اقتراح الأوزان والتكرارات هنا...", className: "w-full h-40 bg-gray-900 border border-gray-800 rounded-xl p-4 text-right text-sm text-white focus:outline-none focus:border-blue-500 mb-4 font-mono", dir: "rtl" }),
+                parsed.length > 0 && React.createElement("div", { className: "bg-green-950/30 border border-green-900 rounded-xl p-3 mb-4" },
+                    React.createElement("p", { className: "text-green-400 text-xs font-bold mb-2" }, "📊 تم التعرف على " + parsed.length + " تمرين:"),
+                    parsed.map((p, i) => React.createElement("div", { key: i, className: "text-green-300 text-xs" }, "• " + p.name + ": " + p.weight + p.unit + " × " + p.reps))
+                ),
+                status && React.createElement("div", { className: "p-3 rounded-xl text-center text-sm mb-4 " + (status.includes("✅") ? "bg-green-950/40 border border-green-900 text-green-400" : "bg-red-950/40 border border-red-900 text-red-400") }, status),
+                React.createElement("button", { onClick: handleSync, className: "w-full bg-blue-600 hover:bg-blue-700 p-3 rounded-xl font-bold text-white transition active:scale-95" }, "تحديث خطة الأوزان بالموقع")
+            );
+        }
+''')
+
+print("Part 4 written successfully")
+
+# Continue writing - AI Coach Screen, Select Screen, Profile Screen
+with open('/mnt/agents/output/workout_tracker_enhanced.html', 'a', encoding='utf-8') as f:
+    f.write('''
+        // AI COACH SCREEN
+        function AICoachScreen({onBack}) {
+            const [query, setQuery] = useState("");
+            const [response, setResponse] = useState("");
+            const [loading, setLoading] = useState(false);
+            const profile = getProfile() || DEFAULT_PROFILE;
+            const workouts = getCustomWorkouts();
+            const allExercises = Object.values(workouts).flat();
+            const exerciseNames = [...new Set(allExercises.map(e => e.name))];
+
+            const askAI = () => {
+                if (!query.trim()) return;
+                setLoading(true); setResponse("");
+                setTimeout(() => {
+                    let res = "💡 نصائح ذكية:\\n\\n1. التدفئة: 5 دقايق cardio قبل التمرين\\n2. الترطيب: 500ml مية خلال التمرين\\n3. النوم: 7-8 ساعات للاستشفاء\\n4. البروتين: 2g لكل kg وزن جسم\\n5. الراحة: 48 ساعة بين تمرين نفس العضلة\\n\\n🎯 هدفك الحالي: نزول دهون حشوية + بناء عضلات";
+                    if (query.includes("بديل") || query.includes("الم")) res = "🔁 بدائل التمارين المتاحة:\\n\\n• تخفيف الوزن 20%\\n• زيادة عدد الجولات بدل الوزن\\n• استبدال بآلة بدل الأوزان الحرة\\n• استشارة مدرب للتقنية\\n\\n⚠️ لو الألم مستمر — وقف التمرين فوراً واستشر طبيب.";
+                    else if (query.includes("اكل") || query.includes("تغذية")) res = "🍽️ خطة تغذية مقترحة:\\n\\n• الإفطار: بيض + خضار + زيت زيتون\\n• ما قبل التمرين: موزة + فول سوداني\\n• ما بعد التمرين: بروتين مصل + موزة\\n• العشاء: دجاج/سمك + سلطة\\n• الماء: 3-4 لتر يومياً\\n\\n⚡ كافيين: كوب قهوة قبل التمرين بـ 30 دقيقة";
+                    setResponse(res); setLoading(false);
+                }, 1500);
+            };
+
+            return React.createElement("div", { className: "min-h-screen text-right p-4 safe-top safe-bottom", style: {background:"#0a0f1a"} },
+                React.createElement("div", { className: "flex justify-between items-center border-b border-gray-800 pb-4 mb-6" },
+                    React.createElement("h2", { className: "text-xl font-bold text-purple-500" }, "🧠 المدرب الذكي"),
+                    React.createElement("button", { onClick: onBack, className: "bg-gray-800 px-3 py-1.5 rounded-lg text-sm text-gray-400" }, "إغلاق")
+                ),
+                React.createElement("div", { className: "bg-purple-950/30 border border-purple-900 rounded-xl p-3 mb-4" },
+                    React.createElement("p", { className: "text-purple-400 text-xs" }, "🎯 اسألني عن: بدائل التمارين | نصائح تغذية | استشفاء | تقنية التمرين")
+                ),
+                React.createElement("div", { className: "flex gap-2 mb-4 flex-wrap" },
+                    ["بديل لـ Incline Press", "نصائح تغذية", "استشفاء بعد Lower", "تقنية Chin-Up"].map((s, i) =>
+                        React.createElement("button", { key: i, onClick: () => setQuery(s), className: "bg-gray-800 hover:bg-gray-700 px-3 py-1.5 rounded-lg text-xs text-gray-300 transition" }, s)
+                    )
+                ),
+                React.createElement("textarea", { value: query, onChange: e => setQuery(e.target.value), placeholder: "اسأل المدرب الذكي...", className: "w-full h-24 bg-gray-900 border border-gray-800 rounded-xl p-4 text-right text-sm text-white focus:outline-none focus:border-purple-500 mb-4", dir: "rtl" }),
+                React.createElement("button", { onClick: askAI, disabled: loading, className: "w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-900 p-3 rounded-xl font-bold text-white transition active:scale-95 mb-6" },
+                    loading ? "⏳ جاري التحليل..." : "🚀 اسأل المدرب"
+                ),
+                response && React.createElement("div", { className: "bg-gray-900 border border-gray-800 rounded-xl p-4 fade-in" },
+                    React.createElement("div", { className: "text-gray-200 text-sm leading-relaxed whitespace-pre-line" }, response)
+                ),
+                React.createElement("div", { className: "mt-6 bg-gray-900 border border-gray-800 rounded-xl p-4" },
+                    React.createElement("h3", { className: "text-gray-400 text-xs font-bold mb-3" }, "📋 التمارين المتاحة للاستبدال"),
+                    React.createElement("div", { className: "flex flex-wrap gap-2" },
+                        exerciseNames.map((name, i) => React.createElement("span", { key: i, className: "bg-gray-800 px-2 py-1 rounded text-xs text-gray-400" }, name))
+                    )
+                )
+            );
+        }
+
+        // SELECT SCREEN
+        function SelectScreen({onSelect}) {
+            const history = getStorage();
+            const p = getProfile() || DEFAULT_PROFILE;
+            const workouts = getCustomWorkouts();
+            return React.createElement("div", { className: "min-h-screen text-right safe-top safe-bottom", style: {background:"#0a0f1a"} },
+                React.createElement("div", { style: {background:"linear-gradient(135deg,#1e293b,#0f172a)",padding:"20px 16px 16px",borderBottom:"1px solid #1e293b"} },
+                    React.createElement("div", { style: {display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14} },
+                        React.createElement("div", { className: "flex gap-2" },
+                            React.createElement("button", { onClick: () => onSelect("__profile__"), style: {background:"#1e293b",border:"1px solid #334155",borderRadius:10,padding:"8px 12px",color:"#94a3b8",cursor:"pointer",fontSize:12} }, "⚙️ بياناتي"),
+                            React.createElement("button", { onClick: () => onSelect("__ai__"), style: {background:"#3b0764",border:"1px solid #a855f733",borderRadius:10,padding:"8px 12px",color:"#a855f7",cursor:"pointer",fontSize:12} }, "🧠 مدربي")
+                        ),
+                        React.createElement("div", null,
+                            React.createElement("div", { style: {color:"#64748b",fontSize:11,letterSpacing:1} }, "مرحباً"),
+                            React.createElement("div", { style: {color:"#f8fafc",fontWeight:800,fontSize:20} }, p.name + " 💪"),
+                            React.createElement("div", { style: {color:"#64748b",fontSize:12,marginTop:2} }, TODAY_AR)
+                        )
+                    ),
+                    React.createElement("div", { style: {display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8} },
+                        [["جلسات",history.length,"#a855f7"],["الدهون",p.fat+"%","#f97316"],["العضلات",p.muscle+"kg","#22c55e"],["الوزن",p.weight+"kg","#3b82f6"]].map(([l,v,c]) =>
+                            React.createElement("div", { key: l, style: {background:"#0f172a",borderRadius:10,padding:"8px 6px",textAlign:"center"} },
+                                React.createElement("div", { style: {color:"#475569",fontSize:9,marginBottom:3} }, l),
+                                React.createElement("div", { style: {color:c,fontWeight:700,fontSize:13} }, v)
+                            )
+                        )
+                    )
+                ),
+                React.createElement("div", { style: {padding:"20px 16px"} },
+                    React.createElement("div", { className: "flex justify-between items-center mb-3" },
+                        React.createElement("div", { className: "flex gap-2" },
+                            React.createElement("button", { onClick: () => onSelect("__sync__"), className: "bg-blue-600/10 border border-blue-500/20 text-blue-400 px-3 py-1.5 rounded-xl text-xs font-bold" }, "🤖 تحديث Gemini"),
+                            React.createElement("button", { onClick: () => onSelect("__export__"), className: "bg-green-600/10 border border-green-500/20 text-green-400 px-3 py-1.5 rounded-xl text-xs font-bold" }, "💾 نسخ احتياطي")
+                        ),
+                        React.createElement("div", { style: {color:"#475569",fontSize:12,letterSpacing:1} }, "اختر تدريب اليوم")
+                    ),
+                    React.createElement("div", { style: {display:"grid",gridTemplateColumns:"1fr 1fr",gap:12} },
+                        Object.keys(workouts).map(name => {
+                            const c = C[name];
+                            const sessions = history.filter(h => h.workout === name);
+                            const lastW = sessions.length > 0 ? sessions[sessions.length-1].date : null;
+                            return React.createElement("button", { key: name, onClick: () => onSelect(name), className: "active:scale-95 transition-transform", style: {background:c.bg,border:"1.5px solid "+c.accent+"33",borderRadius:18,padding:"20px 14px",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:8,boxShadow:"0 4px 20px rgba(0,0,0,0.4)"} },
+                                React.createElement("span", { style: {fontSize:28} }, c.emoji),
+                                React.createElement("span", { style: {color:"#f8fafc",fontWeight:700,fontSize:14} }, name),
+                                React.createElement("span", { style: {color:c.accent,fontSize:10} }, sessions.length > 0 ? "آخر مرة: "+lastW : workouts[name].length+" تمارين")
+                            );
+                        })
+                    ),
+                    React.createElement("button", { onClick: () => onSelect("__history__"), style: {width:"100%",marginTop:14,background:"transparent",border:"1px solid #1e293b",borderRadius:12,padding:"12px",color:"#64748b",cursor:"pointer",fontSize:13,fontWeight:600} }, "📊 السجل والتحليل")
+                )
+            );
+        }
+
+        // PROFILE SCREEN
+        function ProfileScreen({onBack}) {
+            const saved = getProfile() || DEFAULT_PROFILE;
+            const [form, setForm] = useState({ weight: saved.weight, muscle: saved.muscle, fat: saved.fat, visceralFat: saved.visceralFat, restSeconds: saved.restSeconds || 90, rpeEnabled: saved.rpeEnabled !== false });
+            const [done, setDone] = useState(false);
+            const handleSave = () => { saveProfile({...DEFAULT_PROFILE, ...form}); setDone(true); setTimeout(onBack, 1200); };
+            return React.createElement("div", { className: "min-h-screen text-right safe-top safe-bottom", style: {background:"#0a0f1a"} },
+                React.createElement("div", { style: {background:"#1e293b",padding:"20px 16px",borderBottom:"1px solid #334155",display:"flex",alignItems:"center",justifyContent:"space-between"} },
+                    React.createElement("div", { style: {color:"#f8fafc",fontWeight:800,fontSize:18} }, "⚙️ بياناتي الجسمانية"),
+                    React.createElement("button", { onClick: onBack, style: {background:"rgba(255,255,255,0.08)",border:"none",borderRadius:8,padding:"7px 11px",color:"#e2e8f0",cursor:"pointer",fontSize:15} }, "→")
+                ),
+                React.createElement("div", { style: {padding:20} },
+                    React.createElement("div", { style: {background:"#1e293b",borderRadius:16,padding:16,marginBottom:16,border:"1px solid #334155"} },
+                        [["weight","الوزن الكلي (kg)"],["muscle","الكتلة العضلية (kg)"],["fat","الدهون (%)"],["visceralFat","الدهون الحشوية (Visceral)"]].map(([k,l]) =>
+                            React.createElement("div", { key: k, style: {marginBottom:14} },
+                                React.createElement("label", { style: {color:"#94a3b8",fontSize:12,display:"block",marginBottom:6} }, l),
+                                React.createElement("input", { type: "number", step: "0.1", value: form[k], onChange: e => setForm(f => ({...f, [k]: parseFloat(e.target.value) || 0})), style: {width:"100%",background:"#0f172a",border:"1px solid #334155",borderRadius:10,padding:"12px 14px",color:"#f8fafc",fontSize:16,fontWeight:700,boxSizing:"border-box",outline:"none",textAlign:"right"} })
+                            )
+                        ),
+                        React.createElement("div", { style: {marginBottom:14} },
+                            React.createElement("label", { style: {color:"#94a3b8",fontSize:12,display:"block",marginBottom:6} }, "⏱️ وقت الراحة بين المجموعات (ثانية)"),
+                            React.createElement("input", { type: "number", value: form.restSeconds, onChange: e => setForm(f => ({...f, restSeconds: parseInt(e.target.value) || 90})), style: {width:"100%",background:"#0f172a",border:"1px solid #334155",borderRadius:10,padding:"12px 14px",color:"#f8fafc",fontSize:16,fontWeight:700,boxSizing:"border-box",outline:"none",textAlign:"right"} })
+                        ),
+                        React.createElement("div", { style: {display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0"} },
+                            React.createElement("label", { style: {color:"#94a3b8",fontSize:12} }, "📊 تفعيل تقييم RPE (الشدة)"),
+                            React.createElement("button", { onClick: () => setForm(f => ({...f, rpeEnabled: !f.rpeEnabled})), style: {width:50,height:26,borderRadius:13,background:form.rpeEnabled ? "#22c55e" : "#334155",border:"none",cursor:"pointer",position:"relative",transition:"background 0.2s"} },
+                                React.createElement("div", { style: {position:"absolute",top:3,right:form.rpeEnabled ? 3 : 27,width:20,height:20,borderRadius:10,background:"#fff",transition:"right 0.2s"} })
+                            )
+                        )
+                    ),
+                    React.createElement("button", { onClick: handleSave, style: {width:"100%",background:done?"#22c55e":"#3b82f6",border:"none",borderRadius:12,padding:14,color:"#fff",cursor:"pointer",fontSize:15,fontWeight:700,transition:"background 0.2s"} }, done ? "✅ تم الحفظ!" : "💾 حفظ البيانات")
+                )
+            );
+        }
+''')
+
+print("Part 5 written successfully")
+// WORKOUT SCREEN - باقي الكود
+const [rpeModal, setRpeModal] = useState({show: false, exIdx: null, setIdx: null});
+
+useEffect(() => {
+    let iv;
+    if (timer.active) iv = setInterval(() => setTimer(t => ({...t, seconds: t.seconds + 1})), 1000);
+    return () => clearInterval(iv);
+}, [timer.active]);
+
+useEffect(() => {
+    if (!rest.active) return;
+    restSecondsRef.current = rest.seconds;
+    const iv = setInterval(() => {
+        restSecondsRef.current -= 1;
+        const next = restSecondsRef.current;
+        if (next <= 0) {
+            clearInterval(iv);
+            audioManager.playDone();
+            setRest({active: false, seconds: restDuration});
+            return;
+        }
+        audioManager.playCountdown(next);
+        setRest(r => ({...r, seconds: next}));
+    }, 1000);
+    return () => clearInterval(iv);
+}, [rest.active, restDuration]);
+
+const initAudio = () => {
+    const ok = audioManager.init();
+    setAudioReady(ok);
+    if (ok) audioManager.playBeep(600, 0.1, 0.3);
+};
+
+const startRest = () => {
+    audioManager.init();
+    restSecondsRef.current = restDuration;
+    setRest({active: true, seconds: restDuration});
+};
+
+const update = (ei, si, field, val) => setData(d => d.map((ex, i) => i !== ei ? ex : {
+    ...ex, sets: ex.sets.map((s, j) => j !== si ? s : {...s, [field]: val})
+}));
+
+const toggleTimer = (ei, si) => {
+    audioManager.init();
+    if (timer.active && timer.exIdx === ei && timer.setIdx === si) {
+        update(ei, si, "duration", timer.seconds + "s");
+        setTimer({active: false, seconds: 0, exIdx: null, setIdx: null});
+    } else {
+        setTimer({active: true, seconds: 0, exIdx: ei, setIdx: si});
+    }
+};
+
+const handleSetDone = (ei, si, currentSet) => {
+    audioManager.init();
+    if (!currentSet.done) {
+        update(ei, si, "done", true);
+        if (profile.rpeEnabled) setRpeModal({show: true, exIdx: ei, setIdx: si});
+        startRest();
+    } else {
+        update(ei, si, "done", false);
+    }
+};
+
+const saveRPE = (rpeValue) => {
+    if (rpeModal.exIdx !== null && rpeModal.setIdx !== null) {
+        update(rpeModal.exIdx, rpeModal.setIdx, "rpe", rpeValue);
+    }
+    setRpeModal({show: false, exIdx: null, setIdx: null});
+};
+
+const handleFinish = () => {
+    const h = getStorage();
+    const mins = Math.round((Date.now() - startTime.current) / 60000);
+    const session = {date: TODAY_ISO, workout: workoutName, exercises: data, durationMins: mins};
+    h.push(session);
+    saveStorage(h);
+    onFinish(session, h);
+};
+
+const progress = data.reduce((a, ex) => a + ex.sets.filter(s => s.done).length, 0);
+const total = data.reduce((a, ex) => a + ex.sets.length, 0);
+const pct = Math.round((progress / total) * 100);
+const ex = data[activeEx];
