@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Workout">
-    <meta name="theme-color" content="#0a0f1a">
+    <meta name="theme-color" content="#070a13">
     <title>Workout Tracker — أحمد</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -16,48 +16,309 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         * { -webkit-tap-highlight-color: transparent; }
-        body { background-color: #0a0f1a; color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; overscroll-behavior-y: none; }
-        input, select, textarea { -webkit-appearance: none; }
+        html { scroll-behavior: smooth; }
+        body { 
+            background-color: #070a13; 
+            color: #f1f5f9; 
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif; 
+            overscroll-behavior-y: none;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        input, select, textarea { -webkit-appearance: none; outline: none; }
         .safe-top { padding-top: env(safe-area-inset-top); }
         .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #0a0f1a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+
+        /* Modern Animations */
+        @keyframes fadeInUp { 
+            from { opacity: 0; transform: translateY(16px) scale(0.98); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
+        }
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+        @keyframes scaleIn { 
+            from { opacity: 0; transform: scale(0.9); } 
+            to { opacity: 1; transform: scale(1); } 
+        }
+        @keyframes slideUp { 
+            from { transform: translateY(100%); } 
+            to { transform: translateY(0); } 
+        }
+        @keyframes shimmer { 
+            0% { background-position: 200% 0; } 
+            100% { background-position: -200% 0; } 
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); }
+            50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.3); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .fade-in { animation: fadeIn 0.3s ease-out; }
-        .exercise-gif { width: 100%; max-width: 280px; height: 200px; object-fit: contain; border-radius: 12px; background: #0f172a; margin: 0 auto; display: block; }
-        .exercise-gif-loading { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .scale-in { animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        /* Modern Card Styles */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.08);
+        }
+        .glass-card-strong {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(148, 163, 184, 0.12);
+        }
+
+        /* Exercise GIF */
+        .exercise-gif { 
+            width: 100%; 
+            max-width: 300px; 
+            height: 220px; 
+            object-fit: contain; 
+            border-radius: 16px; 
+            background: #0b1120; 
+            margin: 0 auto; 
+            display: block; 
+        }
+        .exercise-gif-loading { 
+            background: linear-gradient(90deg, #0f172a 25%, #1e293b 50%, #0f172a 75%); 
+            background-size: 200% 100%; 
+            animation: shimmer 1.5s infinite; 
+        }
+
+        /* Modern Button Styles */
+        .btn-primary {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary:active {
+            transform: scale(0.96);
+        }
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .btn-primary:active::after {
+            opacity: 1;
+        }
+
+        /* Glow effects */
+        .glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15), 0 0 40px rgba(59, 130, 246, 0.05); }
+        .glow-green { box-shadow: 0 0 20px rgba(34, 197, 94, 0.15), 0 0 40px rgba(34, 197, 94, 0.05); }
+        .glow-purple { box-shadow: 0 0 20px rgba(168, 85, 247, 0.15), 0 0 40px rgba(168, 85, 247, 0.05); }
+        .glow-orange { box-shadow: 0 0 20px rgba(249, 115, 22, 0.15), 0 0 40px rgba(249, 115, 22, 0.05); }
+
+        /* Progress Ring */
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        /* Modal overlay */
+        .modal-overlay {
+            background: rgba(7, 10, 19, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Stagger animation delays */
+        .stagger-1 { animation-delay: 0.05s; }
+        .stagger-2 { animation-delay: 0.1s; }
+        .stagger-3 { animation-delay: 0.15s; }
+        .stagger-4 { animation-delay: 0.2s; }
+        .stagger-5 { animation-delay: 0.25s; }
     </style>
 <base target="_blank">
 </head>
 <body>
     <div id="root"></div>
     <script type="text/babel">
-        const { useState, useEffect, useRef, useCallback } = React;
+        const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
-        // EXERCISE GIF DATABASE
+        // ═══════════════════════════════════════════════════════════════
+        // EXERCISE GIF DATABASE — v6.0 with Local Path Support
+        // ═══════════════════════════════════════════════════════════════
+        const GIF_BASE_PATH = ""; // Change to "/gifs/" for local hosting
+
         const EXERCISE_GIFS = {
-            "Incline Chest Press": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/0c1a4192b8140fe5f80ef563c4af1fbcab216ed9.gif",
-            "Flat Chest Press": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/5b9898742548d64dc91860d5399c601aefdab9d1.gif",
-            "Assisted Chin-Up": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/4b2f8c91d1ae0f5e8ef5d6e309693e68c3000610.gif",
-            "Chest Fly": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/59dc73937662ab45d931cae8b766a5b9e3bbcbc4.gif",
-            "Leg Press": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/c8c424bed80d9c428e70287aeb3059e1da8a485a.gif",
-            "Hack Squat": null, // No duplicate - will show placeholder
-            "Shoulder Press": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/9ebc107555e861ad60c675cd8dc372c1e60b2f58.gif",
-            "Seated Side Raises": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/0959321662715b42ebe3a6784a2cffb5c5c180c6.gif",
-            "Seated Leg Curl": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/a1a6885400ccd48312e4d3bc7a12a8b2438e9c4c.gif",
-            "Triceps Press": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/6002b8f2311e58d8b2aaa83e4c391a36fc5c867e.gif",
-            "Incline Biceps Curl": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/2743043ed295dd88f1c296f7c6f5b677d1d060b9.gif",
-            "Abs Crunch": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/91ec56102f5222f83d938161d14c7efaaea79d15.gif",
-            "Plank": null, // No duplicate - will show placeholder
-            "T-Bar Row": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/88dee93a1e996e287548f140945c4dfb230db6c9.gif",
-            "Chest Supported Row": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/ae74f98d00006026401f167e32802721f2a37420.gif",
-            "Cable Rear Delt Fly": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/e47639981d6dc1b2c4a3be60312fce2a578d6728.gif",
-            "Triceps Pushdown": null, // No duplicate - will show placeholder
-            "Alternating Curl (Preacher)": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/28624734c8e17f81706dc4bd9520b50f1e90ff12.gif",
-            "Side Plank": null, // No duplicate - will show placeholder
-            "Leg Curl": null, // No duplicate - will show placeholder
+            "Incline Chest Press": { 
+                url: "https://kimi-web-img.moonshot.cn/img/gymvisual.com/0c1a4192b8140fe5f80ef563c4af1fbcab216ed9.gif",
+                local: "incline-chest-press.gif",
+                muscle: "صدر علوي"
+            },
+            "Flat Chest Press": { 
+                url: "https://kimi-web-img.moonshot.cn/img/gymvisual.com/5b9898742548d64dc91860d5399c601aefdab9d1.gif",
+                local: "flat-chest-press.gif",
+                muscle: "صدر وسط"
+            },
+            "Assisted Chin-Up": { 
+                url: "https://kimi-web-img.moonshot.cn/img/gymvisual.com/4b2f8c91d1ae0f5e8ef5d6e309693e68c3000610.gif",
+                local: "assisted-chinup.gif",
+                muscle: "ظهر وبايسبس"
+            },
+            "Chest Fly": { 
+                url: "https://kimi-web-img.moonshot.cn/img/gymvisual.com/59dc73937662ab45d931cae8b766a5b9e3bbcbc4.gif",
+                local: "chest-fly.gif",
+                muscle: "صدر كامل"
+            },
+            "Leg Press": { 
+                url: "https://kimi-web-img.moonshot.cn/img/gymvisual.com/c8c424bed80d9c428e70287aeb3059e1da8a485a.gif",
+                local: "leg-press.gif",
+                muscle: "كوادريسبس"
+            },
+            "Hack Squat": { 
+                url: null,
+                local: "hack-squat.gif",
+                muscle: "كوادريسبس + غلوت"
+            },
+            "Shoulder Press": { 
+                url: "https://kimi-web-img.moonshot.cn/img/gymvisual.com/9ebc107555e861ad60c675cd8dc372c1e60b2f58.gif",
+                local: "shoulder-press.gif",
+                muscle: "كتف امامي + جانبي"
+            },
+            "Seated Side Raises": { 
+                url: "https://kimi-web-img.moonshot.cn/img/gymvisual.com/0959321662715b42ebe3a6784a2cffb5c5c180c6.gif",
+                local: "seated-side-raises.gif",
+                muscle: "كتف جانبي"
+            },
+            "Seated Leg Curl": { 
+                url: "https://kimi-web-img.moonshot.cn/img/gymvisual.com/a1a6885400ccd48312e4d3bc7a12a8b2438e9c4c.gif",
+                local: "seated-leg-curl.gif",
+                muscle: "هامسترينج"
+            },
+            "Triceps Press": { 
+                url: "https://kimi-web-img.moonshot.cn/img/gymvisual.com/6002b8f2311e58d8b2aaa83e4c391a36fc5c867e.gif",
+                local: "triceps-press.gif",
+                muscle: "ترايسبس"
+            },
+            "Incline Biceps Curl": { 
+                url: "https://kimi-web-img.moonshot.cn/img/gymvisual.com/2743043ed295dd88f1c296f7c6f5b677d1d060b9.gif",
+                local: "incline-biceps-curl.gif",
+                muscle: "بايسبس"
+            },
+            "Abs Crunch": { 
+                url: "https://kimi-web-img.moonshot.cn/img/gymvisual.com/91ec56102f5222f83d938161d14c7efaaea79d15.gif",
+                local: "abs-crunch.gif",
+                muscle: "بطن علوي"
+            },
+            "Plank": { 
+                url: null,
+                local: "plank.gif",
+                muscle: "كور كامل"
+            },
+            "T-Bar Row": { 
+                url: "https://kimi-web-img.moonshot.cn/img/gymvisual.com/88dee93a1e996e287548f140945c4dfb230db6c9.gif",
+                local: "tbar-row.gif",
+                muscle: "ظهر وسط"
+            },
+            "Chest Supported Row": { 
+                url: "https://kimi-web-img.moonshot.cn/img/gymvisual.com/ae74f98d00006026401f167e32802721f2a37420.gif",
+                local: "chest-supported-row.gif",
+                muscle: "ظهر وسط"
+            },
+            "Cable Rear Delt Fly": { 
+                url: "https://kimi-web-img.moonshot.cn/img/gymvisual.com/e47639981d6dc1b2c4a3be60312fce2a578d6728.gif",
+                local: "cable-rear-delt.gif",
+                muscle: "كتف خلفي"
+            },
+            "Triceps Pushdown": { 
+                url: null,
+                local: "triceps-pushdown.gif",
+                muscle: "ترايسبس"
+            },
+            "Alternating Curl (Preacher)": { 
+                url: "https://kimi-web-img.moonshot.cn/img/gymvisual.com/28624734c8e17f81706dc4bd9520b50f1e90ff12.gif",
+                local: "preacher-curl.gif",
+                muscle: "بايسبس"
+            },
+            "Side Plank": { 
+                url: null,
+                local: "side-plank.gif",
+                muscle: "كور جانبي"
+            },
+            "Leg Curl": { 
+                url: null,
+                local: "leg-curl.gif",
+                muscle: "هامسترينج"
+            },
+            // Alternative exercises for substitution
+            "Dumbbell Bench Press": { url: null, local: "db-bench.gif", muscle: "صدر وسط" },
+            "Incline Dumbbell Press": { url: null, local: "incline-db-press.gif", muscle: "صدر علوي" },
+            "Cable Fly": { url: null, local: "cable-fly.gif", muscle: "صدر كامل" },
+            "Pec Deck": { url: null, local: "pec-deck.gif", muscle: "صدر كامل" },
+            "Lat Pulldown": { url: null, local: "lat-pulldown.gif", muscle: "ظهر عريض" },
+            "Barbell Row": { url: null, local: "bb-row.gif", muscle: "ظهر وسط" },
+            "Seated Cable Row": { url: null, local: "cable-row.gif", muscle: "ظهر وسط" },
+            "Face Pull": { url: null, local: "face-pull.gif", muscle: "كتف خلفي" },
+            "Reverse Pec Deck": { url: null, local: "reverse-pec-deck.gif", muscle: "كتف خلفي" },
+            "Lateral Raise Machine": { url: null, local: "lateral-raise-machine.gif", muscle: "كتف جانبي" },
+            "Arnold Press": { url: null, local: "arnold-press.gif", muscle: "كتف امامي + جانبي" },
+            "Squat": { url: null, local: "squat.gif", muscle: "كوادريسبس + غلوت" },
+            "Leg Extension": { url: null, local: "leg-extension.gif", muscle: "كوادريسبس" },
+            "Romanian Deadlift": { url: null, local: "rdl.gif", muscle: "هامسترينج + غلوت" },
+            "Lying Leg Curl": { url: null, local: "lying-leg-curl.gif", muscle: "هامسترينج" },
+            "Close Grip Bench": { url: null, local: "cgbp.gif", muscle: "ترايسبس" },
+            "Overhead Triceps Extension": { url: null, local: "oh-triceps.gif", muscle: "ترايسبس" },
+            "Barbell Curl": { url: null, local: "bb-curl.gif", muscle: "بايسبس" },
+            "Hammer Curl": { url: null, local: "hammer-curl.gif", muscle: "بايسبس + ساعد" },
+            "Cable Crunch": { url: null, local: "cable-crunch.gif", muscle: "بطن علوي" },
+            "Hanging Leg Raise": { url: null, local: "hanging-leg-raise.gif", muscle: "بطن سفلي" },
+            "Dead Bug": { url: null, local: "dead-bug.gif", muscle: "كور كامل" },
+            "Pallof Press": { url: null, local: "pallof.gif", muscle: "كور جانبي" },
+        };
+
+        // Helper to get GIF URL (supports local paths)
+        const getGifUrl = (exerciseName) => {
+            const entry = EXERCISE_GIFS[exerciseName];
+            if (!entry) return null;
+            if (GIF_BASE_PATH && entry.local) {
+                return GIF_BASE_PATH + entry.local;
+            }
+            return entry.url;
+        };
+
+        // ═══════════════════════════════════════════════════════════════
+        // EXERCISE SUBSTITUTION DATABASE
+        // ═══════════════════════════════════════════════════════════════
+        const EXERCISE_ALTERNATIVES = {
+            "Incline Chest Press": ["Incline Dumbbell Press", "Flat Chest Press", "Dumbbell Bench Press"],
+            "Flat Chest Press": ["Dumbbell Bench Press", "Incline Chest Press", "Chest Fly"],
+            "Assisted Chin-Up": ["Lat Pulldown", "T-Bar Row", "Barbell Row"],
+            "Chest Fly": ["Cable Fly", "Pec Deck", "Flat Chest Press"],
+            "Leg Press": ["Hack Squat", "Squat", "Leg Extension"],
+            "Hack Squat": ["Leg Press", "Squat", "Leg Extension"],
+            "Shoulder Press": ["Arnold Press", "Seated Side Raises"],
+            "Seated Side Raises": ["Lateral Raise Machine", "Shoulder Press", "Arnold Press"],
+            "Seated Leg Curl": ["Lying Leg Curl", "Leg Curl", "Romanian Deadlift"],
+            "Triceps Press": ["Triceps Pushdown", "Close Grip Bench", "Overhead Triceps Extension"],
+            "Incline Biceps Curl": ["Barbell Curl", "Hammer Curl", "Alternating Curl (Preacher)"],
+            "Abs Crunch": ["Cable Crunch", "Hanging Leg Raise", "Dead Bug"],
+            "Plank": ["Side Plank", "Dead Bug", "Cable Crunch"],
+            "T-Bar Row": ["Barbell Row", "Seated Cable Row", "Chest Supported Row"],
+            "Chest Supported Row": ["Seated Cable Row", "T-Bar Row", "Barbell Row"],
+            "Cable Rear Delt Fly": ["Face Pull", "Reverse Pec Deck", "Seated Side Raises"],
+            "Triceps Pushdown": ["Triceps Press", "Close Grip Bench", "Overhead Triceps Extension"],
+            "Alternating Curl (Preacher)": ["Barbell Curl", "Hammer Curl", "Incline Biceps Curl"],
+            "Side Plank": ["Pallof Press", "Plank", "Dead Bug"],
+            "Leg Curl": ["Seated Leg Curl", "Lying Leg Curl", "Romanian Deadlift"],
         };
 
         const DEFAULT_PROFILE = { name: "احمد", weight: 86.5, muscle: 61.6, fat: 21.4, visceralFat: 12, age: 38, dose: "Mounjaro 5mg", restSeconds: 90, rpeEnabled: true };
@@ -97,21 +358,21 @@
         };
 
         const C = {
-            "Upper 1":{ bg:"#1e3a5f", accent:"#3b82f6", emoji:"💪" },
-            "Lower 1":{ bg:"#14532d", accent:"#22c55e", emoji:"🦵" },
-            "Upper 2":{ bg:"#3b0764", accent:"#a855f7", emoji:"🏋️" },
-            "Lower 2":{ bg:"#7c2d12", accent:"#f97316", emoji:"🔥" },
+            "Upper 1":{ bg:"#0f1d33", accent:"#3b82f6", gradient:"linear-gradient(135deg, #1e3a5f, #0f1d33)", emoji:"💪", glow:"rgba(59,130,246,0.2)" },
+            "Lower 1":{ bg:"#0a2918", accent:"#22c55e", gradient:"linear-gradient(135deg, #14532d, #0a2918)", emoji:"🦵", glow:"rgba(34,197,94,0.2)" },
+            "Upper 2":{ bg:"#1a0a2e", accent:"#a855f7", gradient:"linear-gradient(135deg, #3b0764, #1a0a2e)", emoji:"🏋️", glow:"rgba(168,85,247,0.2)" },
+            "Lower 2":{ bg:"#2a1006", accent:"#f97316", gradient:"linear-gradient(135deg, #7c2d12, #2a1006)", emoji:"🔥", glow:"rgba(249,115,22,0.2)" },
         };
 
         const TODAY_ISO = new Date().toISOString().split("T")[0];
         const TODAY_AR = new Date().toLocaleDateString("ar-EG",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
 
-        const getStorage = () => { try{ return JSON.parse(localStorage.getItem("wt_ahmed_v5")||"[]"); }catch{ return []; } };
-        const saveStorage = d => { try{ localStorage.setItem("wt_ahmed_v5", JSON.stringify(d)); }catch{} };
-        const getProfile = () => { try{ return JSON.parse(localStorage.getItem("wt_profile_v2")||"null"); }catch{ return null; } };
-        const saveProfile = p => { try{ localStorage.setItem("wt_profile_v2", JSON.stringify(p)); }catch{} };
-        const getCustomWorkouts = () => { try{ const s = localStorage.getItem("wt_custom_workouts_v2"); return s ? JSON.parse(s) : DEFAULT_WORKOUTS; }catch{ return DEFAULT_WORKOUTS; } };
-        const saveCustomWorkouts = w => { try{ localStorage.setItem("wt_custom_workouts_v2", JSON.stringify(w)); }catch{} };
+        const getStorage = () => { try{ return JSON.parse(localStorage.getItem("wt_ahmed_v6")||"[]"); }catch{ return []; } };
+        const saveStorage = d => { try{ localStorage.setItem("wt_ahmed_v6", JSON.stringify(d)); }catch{} };
+        const getProfile = () => { try{ return JSON.parse(localStorage.getItem("wt_profile_v3")||"null"); }catch{ return null; } };
+        const saveProfile = p => { try{ localStorage.setItem("wt_profile_v3", JSON.stringify(p)); }catch{} };
+        const getCustomWorkouts = () => { try{ const s = localStorage.getItem("wt_custom_workouts_v3"); return s ? JSON.parse(s) : DEFAULT_WORKOUTS; }catch{ return DEFAULT_WORKOUTS; } };
+        const saveCustomWorkouts = w => { try{ localStorage.setItem("wt_custom_workouts_v3", JSON.stringify(w)); }catch{} };
 
         const KG_TO_LB = 2.20462;
         const calcVolume = exercises => exercises.reduce((t, ex) => {
@@ -135,7 +396,114 @@
             ),
         }));
 
-        // ====== BACKGROUND TIMER (survives lock screen) ======
+        // ═══════════════════════════════════════════════════════════════
+        // AUDIO MANAGER v6.0 — Safari + Spotify Compatible
+        // ═══════════════════════════════════════════════════════════════
+        class AudioManager {
+            constructor() { 
+                this.ctx = null; 
+                this.initialized = false;
+                this._bindEvents();
+            }
+
+            _bindEvents() {
+                const events = ['touchstart', 'touchend', 'click', 'mousedown', 'keydown'];
+                const handler = () => { this.init(); };
+                events.forEach(evt => {
+                    document.addEventListener(evt, handler, { once: true, passive: true });
+                });
+            }
+
+            init() {
+                if (this.initialized) return true;
+                try {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (!AudioCtx) return false;
+                    this.ctx = new AudioCtx();
+                    this.initialized = true;
+                    if (this.ctx.state === "suspended") {
+                        this.ctx.resume();
+                    }
+                    document.addEventListener('visibilitychange', () => {
+                        if (!document.hidden && this.ctx && this.ctx.state === "suspended") {
+                            this.ctx.resume();
+                        }
+                    });
+                    return true;
+                } catch (e) { return false; }
+            }
+
+            ensureRunning() {
+                if (!this.ctx) this.init();
+                if (this.ctx && this.ctx.state === "suspended") {
+                    this.ctx.resume();
+                }
+                return this.ctx && this.ctx.state === "running";
+            }
+
+            // Ultra-short beeps that won't interrupt Spotify
+            playBeep(freq, dur, vol) {
+                this.vibrate(50);
+                if (!this.ensureRunning()) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    const actualDur = dur || 0.06;
+                    const actualVol = (vol || 0.15) * 0.25;
+
+                    osc.connect(gain); 
+                    gain.connect(this.ctx.destination);
+                    osc.frequency.value = freq || 1400;
+
+                    gain.gain.setValueAtTime(0, this.ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(actualVol, this.ctx.currentTime + 0.005);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + actualDur);
+
+                    osc.start(this.ctx.currentTime); 
+                    osc.stop(this.ctx.currentTime + actualDur + 0.02);
+                } catch (e) {}
+            }
+
+            playDone() {
+                this.vibrate([100, 50, 100, 50, 200]);
+                if (!this.ensureRunning()) return;
+                try {
+                    const now = this.ctx.currentTime;
+                    [0, 0.12].forEach((t, i) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.connect(gain); 
+                        gain.connect(this.ctx.destination);
+                        osc.frequency.value = i === 0 ? 1400 : 1800;
+
+                        gain.gain.setValueAtTime(0, now + t);
+                        gain.gain.linearRampToValueAtTime(0.08, now + t + 0.005);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + t + 0.15);
+
+                        osc.start(now + t); 
+                        osc.stop(now + t + 0.18);
+                    });
+                } catch (e) {}
+            }
+
+            playCountdown(seconds) {
+                if (seconds <= 5) {
+                    this.playBeep(1600, 0.05, 0.2);
+                    this.vibrate(25);
+                } else if (seconds <= 10) {
+                    this.playBeep(1200, 0.04, 0.15);
+                }
+            }
+
+            vibrate(pattern) { 
+                if (navigator.vibrate) navigator.vibrate(pattern); 
+            }
+        }
+        const audioManager = new AudioManager();
+
+        // ═══════════════════════════════════════════════════════════════
+        // BACKGROUND TIMER — Survives Lock Screen
+        // ═══════════════════════════════════════════════════════════════
         class BackgroundTimer {
             constructor() {
                 this.startTime = null;
@@ -155,7 +523,6 @@
                 this.onDone = onDone;
                 this.startTime = Date.now();
 
-                // Save to localStorage for persistence across background
                 localStorage.setItem('wt_timer_active', 'true');
                 localStorage.setItem('wt_timer_end', String(Date.now() + seconds * 1000));
                 localStorage.setItem('wt_timer_duration', String(seconds));
@@ -163,7 +530,6 @@
                 this._tick();
                 this.intervalId = setInterval(() => this._tick(), 1000);
 
-                // Listen for visibility changes
                 this._visibilityHandler = () => {
                     if (!document.hidden) {
                         this._syncFromStorage();
@@ -174,7 +540,6 @@
 
             _tick() {
                 if (!this.active) return;
-
                 const now = Date.now();
                 const elapsed = Math.floor((now - this.startTime) / 1000);
                 this.remaining = Math.max(0, this.duration - elapsed);
@@ -214,125 +579,11 @@
                 localStorage.removeItem('wt_timer_end');
                 localStorage.removeItem('wt_timer_duration');
             }
-
-            getRemaining() {
-                return this.remaining;
-            }
         }
 
-        class AudioManager {
-            constructor() { 
-                this.ctx = null; 
-                this.initialized = false;
-                this._bindEvents();
-            }
-
-            _bindEvents() {
-                // Try to init on ANY user interaction - critical for Safari
-                const events = ['touchstart', 'touchend', 'click', 'mousedown', 'keydown'];
-                const handler = () => { this.init(); };
-                events.forEach(evt => {
-                    document.addEventListener(evt, handler, { once: true, passive: true });
-                });
-            }
-
-            init() {
-                if (this.initialized) return true;
-                try {
-                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                    if (!AudioCtx) return false;
-                    this.ctx = new AudioCtx();
-                    this.initialized = true;
-                    if (this.ctx.state === "suspended") {
-                        this.ctx.resume();
-                    }
-                    // Also try to resume on visibility change
-                    document.addEventListener('visibilitychange', () => {
-                        if (!document.hidden && this.ctx && this.ctx.state === "suspended") {
-                            this.ctx.resume();
-                        }
-                    });
-                    return true;
-                } catch (e) { return false; }
-            }
-
-            ensureRunning() {
-                if (!this.ctx) this.init();
-                if (this.ctx && this.ctx.state === "suspended") {
-                    this.ctx.resume();
-                }
-                return this.ctx && this.ctx.state === "running";
-            }
-
-            // FIXED: Very short, quiet beeps that won't interrupt Spotify
-            playBeep(freq, dur, vol) {
-                // Always vibrate as fallback/primary on mobile
-                this.vibrate(50);
-
-                if (!this.ensureRunning()) return;
-
-                try {
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-
-                    // Ultra-short, quiet beep so it doesn't interrupt Spotify
-                    const actualDur = dur || 0.06;
-                    const actualVol = (vol || 0.15) * 0.25;
-
-                    osc.connect(gain); 
-                    gain.connect(this.ctx.destination);
-                    osc.frequency.value = freq || 1400;
-
-                    // Use linear ramp for less audio glitch
-                    gain.gain.setValueAtTime(0, this.ctx.currentTime);
-                    gain.gain.linearRampToValueAtTime(actualVol, this.ctx.currentTime + 0.005);
-                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + actualDur);
-
-                    osc.start(this.ctx.currentTime); 
-                    osc.stop(this.ctx.currentTime + actualDur + 0.02);
-                } catch (e) {}
-            }
-
-            playDone() {
-                // Strong vibration pattern as primary notification
-                this.vibrate([100, 50, 100, 50, 200]);
-
-                if (!this.ensureRunning()) return;
-
-                try {
-                    const now = this.ctx.currentTime;
-                    [0, 0.12].forEach((t, i) => {
-                        const osc = this.ctx.createOscillator();
-                        const gain = this.ctx.createGain();
-                        osc.connect(gain); 
-                        gain.connect(this.ctx.destination);
-                        osc.frequency.value = i === 0 ? 1400 : 1800;
-
-                        gain.gain.setValueAtTime(0, now + t);
-                        gain.gain.linearRampToValueAtTime(0.08, now + t + 0.005);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + t + 0.15);
-
-                        osc.start(now + t); 
-                        osc.stop(now + t + 0.18);
-                    });
-                } catch (e) {}
-            }
-
-            playCountdown(seconds) {
-                if (seconds <= 5) {
-                    this.playBeep(1600, 0.05, 0.2);
-                    this.vibrate(25);
-                } else if (seconds <= 10) {
-                    this.playBeep(1200, 0.04, 0.15);
-                }
-            }
-
-            vibrate(pattern) { 
-                if (navigator.vibrate) navigator.vibrate(pattern); 
-            }
-        }
-        const audioManager = new AudioManager();
-
+        // ═══════════════════════════════════════════════════════════════
+        // UTILITY FUNCTIONS
+        // ═══════════════════════════════════════════════════════════════
         function buildPrompt(session, history, profile) {
             const p = profile || DEFAULT_PROFILE;
             const prev = history.filter(h => h.workout === session.workout).slice(-2)[0] || null;
@@ -375,7 +626,7 @@
         }
 
         function exportData() {
-            const data = { profile: getProfile() || DEFAULT_PROFILE, workouts: getCustomWorkouts(), history: getStorage(), exportDate: new Date().toISOString(), version: "5.0" };
+            const data = { profile: getProfile() || DEFAULT_PROFILE, workouts: getCustomWorkouts(), history: getStorage(), exportDate: new Date().toISOString(), version: "6.0" };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a"); a.href = url; a.download = "workout_backup_" + TODAY_ISO + ".json";
@@ -391,25 +642,195 @@
             } catch (e) { return { success: false, error: e.message }; }
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // MODERN EXERCISE GIF COMPONENT v6.0
+        // ═══════════════════════════════════════════════════════════════
         function ExerciseGif({ name, accent }) {
             const [loaded, setLoaded] = useState(false);
             const [error, setError] = useState(false);
-            const gifUrl = EXERCISE_GIFS[name];
+            const [useLocal, setUseLocal] = useState(false);
+
+            const entry = EXERCISE_GIFS[name];
+            const gifUrl = useLocal && entry?.local 
+                ? (GIF_BASE_PATH + entry.local) 
+                : getGifUrl(name);
+
+            const muscle = entry?.muscle || name;
+
             if (!gifUrl) {
-                return React.createElement("div", { style: {width:"100%",maxWidth:280,height:200,background:"#0f172a",borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto",border:"1px solid " + accent + "22"} },
-                    React.createElement("span", { style: {fontSize:48} }, "🏋️")
+                return React.createElement("div", { 
+                    style: {
+                        width: "100%", maxWidth: 300, height: 220,
+                        background: "linear-gradient(135deg, #0b1120, #0f172a)",
+                        borderRadius: 16, display: "flex", flexDirection: "column",
+                        alignItems: "center", justifyContent: "center", margin: "0 auto",
+                        border: "1px solid " + accent + "22", gap: 12
+                    } 
+                },
+                    React.createElement("span", { style: {fontSize: 56, filter: "drop-shadow(0 4px 12px " + accent + "44)"} }, "🏋️"),
+                    React.createElement("span", { style: {color: "#475569", fontSize: 12, fontWeight: 600} }, muscle),
+                    React.createElement("span", { style: {color: "#334155", fontSize: 10} }, "GIF غير متوفر حالياً")
                 );
             }
-            return React.createElement("div", { style: {position:"relative",width:"100%",maxWidth:280,margin:"0 auto"} },
-                !loaded && React.createElement("div", { className: "exercise-gif-loading", style: {position:"absolute",top:0,left:0,right:0,bottom:0,borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center"} },
-                    React.createElement("span", { style: {color:"#64748b",fontSize:12} }, "جاري التحميل...")
+
+            return React.createElement("div", { style: {position: "relative", width: "100%", maxWidth: 300, margin: "0 auto"} },
+                !loaded && !error && React.createElement("div", { 
+                    className: "exercise-gif-loading", 
+                    style: {
+                        position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+                        borderRadius: 16, display: "flex", flexDirection: "column",
+                        alignItems: "center", justifyContent: "center", gap: 8
+                    } 
+                },
+                    React.createElement("div", { 
+                        style: {width: 32, height: 32, border: "2px solid " + accent + "33", borderTopColor: accent, borderRadius: "50%", animation: "spin 0.8s linear infinite"} 
+                    }),
+                    React.createElement("span", { style: {color: "#475569", fontSize: 11} }, "جاري التحميل...")
                 ),
-                React.createElement("img", { src: gifUrl, alt: name, className: "exercise-gif", style: {opacity: loaded ? 1 : 0, transition: "opacity 0.3s"}, onLoad: () => setLoaded(true), onError: () => setError(true) }),
-                error && React.createElement("div", { style: {position:"absolute",top:0,left:0,right:0,bottom:0,background:"#0f172a",borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",border:"1px solid " + accent + "22"} },
-                    React.createElement("span", { style: {fontSize:48} }, "🏋️")
+                React.createElement("img", { 
+                    src: gifUrl, alt: name, className: "exercise-gif",
+                    style: {opacity: loaded ? 1 : 0, transition: "opacity 0.4s ease"},
+                    onLoad: () => setLoaded(true),
+                    onError: () => {
+                        if (!useLocal && entry?.local) {
+                            setUseLocal(true);
+                        } else {
+                            setError(true);
+                        }
+                    }
+                }),
+                (error || (useLocal && !loaded)) && React.createElement("div", { 
+                    style: {
+                        position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+                        background: "linear-gradient(135deg, #0b1120, #0f172a)",
+                        borderRadius: 16, display: "flex", flexDirection: "column",
+                        alignItems: "center", justifyContent: "center", border: "1px solid " + accent + "22",
+                        gap: 12
+                    } 
+                },
+                    React.createElement("span", { style: {fontSize: 56, filter: "drop-shadow(0 4px 12px " + accent + "44)"} }, "🏋️"),
+                    React.createElement("span", { style: {color: "#475569", fontSize: 12, fontWeight: 600} }, muscle),
+                    React.createElement("span", { style: {color: "#334155", fontSize: 10} }, "GIF غير متوفر حالياً")
                 )
             );
         }
+
+        // ═══════════════════════════════════════════════════════════════
+        // EXERCISE SUBSTITUTION MODAL
+        // ═══════════════════════════════════════════════════════════════
+        function SubstitutionModal({ exerciseName, onSelect, onClose, accent }) {
+            const alternatives = EXERCISE_ALTERNATIVES[exerciseName] || [];
+            const currentEntry = EXERCISE_GIFS[exerciseName];
+            const currentMuscle = currentEntry?.muscle || "";
+
+            return React.createElement("div", { 
+                className: "modal-overlay fade-in",
+                style: {
+                    position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+                    display: "flex", alignItems: "flex-end", justifyContent: "center",
+                    zIndex: 200, padding: "0 16px 24px"
+                },
+                onClick: onClose
+            },
+                React.createElement("div", { 
+                    className: "slide-up",
+                    style: {
+                        background: "linear-gradient(180deg, #0f172a, #070a13)",
+                        borderRadius: "24px 24px 24px 24px",
+                        border: "1px solid rgba(148,163,184,0.1)",
+                        width: "100%", maxWidth: 420,
+                        maxHeight: "80vh", overflow: "auto",
+                        boxShadow: "0 -20px 60px rgba(0,0,0,0.6), 0 0 40px " + accent + "15"
+                    },
+                    onClick: e => e.stopPropagation()
+                },
+                    // Handle bar
+                    React.createElement("div", { style: {display: "flex", justifyContent: "center", padding: "12px 0 4px"} },
+                        React.createElement("div", { style: {width: 40, height: 4, background: "#334155", borderRadius: 2} })
+                    ),
+
+                    // Header
+                    React.createElement("div", { style: {padding: "16px 20px 12px", textAlign: "center"} },
+                        React.createElement("div", { style: {fontSize: 32, marginBottom: 8} }, "🔄"),
+                        React.createElement("h3", { style: {color: "#f8fafc", fontSize: 17, fontWeight: 700, marginBottom: 4} }, "استبدال التمرين"),
+                        React.createElement("p", { style: {color: "#64748b", fontSize: 12} }, 
+                            "اختر بديلاً لـ ", React.createElement("span", {style: {color: accent, fontWeight: 600}}, exerciseName)
+                        )
+                    ),
+
+                    // Current exercise info
+                    React.createElement("div", { 
+                        style: {
+                            margin: "0 16px 12px", padding: "12px 16px",
+                            background: "rgba(255,255,255,0.03)", borderRadius: 14,
+                            border: "1px solid rgba(148,163,184,0.06)"
+                        } 
+                    },
+                        React.createElement("div", { style: {color: "#94a3b8", fontSize: 10, marginBottom: 4, letterSpacing: 1} }, "التمرين الحالي"),
+                        React.createElement("div", { style: {color: "#e2e8f0", fontSize: 14, fontWeight: 700} }, exerciseName),
+                        React.createElement("div", { style: {color: accent, fontSize: 11, marginTop: 2} }, currentMuscle)
+                    ),
+
+                    // Alternatives list
+                    React.createElement("div", { style: {padding: "0 16px 16px"} },
+                        React.createElement("div", { style: {color: "#64748b", fontSize: 10, marginBottom: 10, letterSpacing: 1, textAlign: "right"} }, "البدائل المقترحة"),
+                        alternatives.length === 0 
+                            ? React.createElement("div", { style: {textAlign: "center", padding: "30px 0", color: "#475569", fontSize: 13} },
+                                "لا توجد بدائل مقترحة لهذا التمرين"
+                            )
+                            : alternatives.map((altName, i) => {
+                                const altEntry = EXERCISE_GIFS[altName];
+                                const altMuscle = altEntry?.muscle || "";
+                                const hasGif = !!getGifUrl(altName);
+
+                                return React.createElement("button", {
+                                    key: i,
+                                    onClick: () => onSelect(altName),
+                                    className: "btn-primary fade-in-up stagger-" + (i + 1),
+                                    style: {
+                                        width: "100%", display: "flex", alignItems: "center",
+                                        justifyContent: "space-between", padding: "14px 16px",
+                                        marginBottom: 8, background: "rgba(255,255,255,0.03)",
+                                        border: "1px solid rgba(148,163,184,0.08)",
+                                        borderRadius: 14, cursor: "pointer",
+                                        flexDirection: "row-reverse"
+                                    }
+                                },
+                                    React.createElement("div", { style: {display: "flex", alignItems: "center", gap: 12, flexDirection: "row-reverse"} },
+                                        React.createElement("div", { style: {
+                                            width: 40, height: 40, borderRadius: 12,
+                                            background: hasGif ? accent + "15" : "#1e293b",
+                                            display: "flex", alignItems: "center", justifyContent: "center",
+                                            fontSize: 18
+                                        }}, hasGif ? "🎬" : "🏋️"),
+                                        React.createElement("div", { style: {textAlign: "right"} },
+                                            React.createElement("div", { style: {color: "#f1f5f9", fontSize: 14, fontWeight: 600} }, altName),
+                                            React.createElement("div", { style: {color: "#64748b", fontSize: 11, marginTop: 2} }, altMuscle)
+                                        )
+                                    ),
+                                    React.createElement("span", { style: {color: accent, fontSize: 18} }, "←")
+                                );
+                            })
+                    ),
+
+                    // Close button
+                    React.createElement("div", { style: {padding: "0 16px 20px"} },
+                        React.createElement("button", {
+                            onClick: onClose,
+                            style: {
+                                width: "100%", padding: "12px", background: "transparent",
+                                border: "1px solid rgba(148,163,184,0.15)", borderRadius: 12,
+                                color: "#64748b", cursor: "pointer", fontSize: 13, fontWeight: 600
+                            }
+                        }, "إلغاء")
+                    )
+                )
+            );
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // SCREENS
+        // ═══════════════════════════════════════════════════════════════
 
         function GeminiSyncScreen({onBack}) {
             const [text, setText] = useState("");
@@ -456,21 +877,21 @@
                     setTimeout(onBack, 2000);
                 } catch (e) { setStatus("خطأ: " + e.message); }
             };
-            return React.createElement("div", { className: "min-h-screen text-right p-4 safe-top safe-bottom", style: {background:"#0a0f1a"} },
-                React.createElement("div", { className: "flex justify-between items-center border-b border-gray-800 pb-4 mb-6" },
-                    React.createElement("h2", { className: "text-xl font-bold text-blue-500" }, "مزامنة الأوزان من Gemini"),
-                    React.createElement("button", { onClick: onBack, className: "bg-gray-800 px-3 py-1.5 rounded-lg text-sm text-gray-400" }, "إغلاق")
+            return React.createElement("div", { className: "min-h-screen text-right p-4 safe-top safe-bottom", style: {background:"#070a13"} },
+                React.createElement("div", { className: "flex justify-between items-center border-b border-gray-800/60 pb-4 mb-6" },
+                    React.createElement("h2", { className: "text-xl font-bold", style: {color: "#3b82f6"} }, "مزامنة الأوزان من Gemini"),
+                    React.createElement("button", { onClick: onBack, className: "glass-card px-4 py-2 rounded-xl text-sm text-gray-400 btn-primary" }, "إغلاق")
                 ),
-                React.createElement("div", { className: "bg-blue-950/30 border border-blue-900 rounded-xl p-3 mb-4" },
-                    React.createElement("p", { className: "text-blue-400 text-xs" }, "انسخ رد Gemini هنا. يدعم: Exercise: 50kg × 12")
+                React.createElement("div", { className: "glass-card rounded-2xl p-4 mb-4" },
+                    React.createElement("p", { className: "text-blue-400/80 text-xs" }, "انسخ رد Gemini هنا. يدعم: Exercise: 50kg × 12")
                 ),
-                React.createElement("textarea", { value: text, onChange: e => { setText(e.target.value); setParsed(parseGeminiText(e.target.value)); }, placeholder: "الصق نص اقتراح الأوزان...", className: "w-full h-40 bg-gray-900 border border-gray-800 rounded-xl p-4 text-right text-sm text-white focus:outline-none focus:border-blue-500 mb-4", dir: "rtl" }),
-                parsed.length > 0 && React.createElement("div", { className: "bg-green-950/30 border border-green-900 rounded-xl p-3 mb-4" },
-                    React.createElement("p", { className: "text-green-400 text-xs font-bold" }, "تم التعرف على " + parsed.length + " تمرين"),
-                    parsed.map((p, i) => React.createElement("div", { key: i, className: "text-green-300 text-xs" }, "• " + p.name + ": " + p.weight + p.unit + " × " + p.reps))
+                React.createElement("textarea", { value: text, onChange: e => { setText(e.target.value); setParsed(parseGeminiText(e.target.value)); }, placeholder: "الصق نص اقتراح الأوزان...", className: "w-full h-40 bg-gray-900/50 border border-gray-800/60 rounded-2xl p-4 text-right text-sm text-white focus:outline-none focus:border-blue-500/50 mb-4", dir: "rtl" }),
+                parsed.length > 0 && React.createElement("div", { className: "glass-card border-green-500/20 rounded-2xl p-4 mb-4" },
+                    React.createElement("p", { className: "text-green-400 text-xs font-bold mb-2" }, "تم التعرف على " + parsed.length + " تمرين"),
+                    parsed.map((p, i) => React.createElement("div", { key: i, className: "text-green-300/80 text-xs" }, "• " + p.name + ": " + p.weight + p.unit + " × " + p.reps))
                 ),
-                status && React.createElement("div", { className: "p-3 rounded-xl text-center text-sm mb-4 " + (status.includes("تم") ? "bg-green-950/40 border border-green-900 text-green-400" : "bg-red-950/40 border border-red-900 text-red-400") }, status),
-                React.createElement("button", { onClick: handleSync, className: "w-full bg-blue-600 hover:bg-blue-700 p-3 rounded-xl font-bold text-white" }, "تحديث خطة الأوزان")
+                status && React.createElement("div", { className: "p-4 rounded-2xl text-center text-sm mb-4 " + (status.includes("تم") ? "glass-card border-green-500/30 text-green-400" : "glass-card border-red-500/30 text-red-400") }, status),
+                React.createElement("button", { onClick: handleSync, className: "w-full btn-primary p-4 rounded-2xl font-bold text-white", style: {background: "linear-gradient(135deg, #3b82f6, #2563eb)"} }, "تحديث خطة الأوزان")
             );
         }
 
@@ -492,24 +913,24 @@
                     setResponse(res); setLoading(false);
                 }, 1500);
             };
-            return React.createElement("div", { className: "min-h-screen text-right p-4 safe-top safe-bottom", style: {background:"#0a0f1a"} },
-                React.createElement("div", { className: "flex justify-between items-center border-b border-gray-800 pb-4 mb-6" },
-                    React.createElement("h2", { className: "text-xl font-bold text-purple-500" }, "المدرب الذكي"),
-                    React.createElement("button", { onClick: onBack, className: "bg-gray-800 px-3 py-1.5 rounded-lg text-sm text-gray-400" }, "إغلاق")
+            return React.createElement("div", { className: "min-h-screen text-right p-4 safe-top safe-bottom", style: {background:"#070a13"} },
+                React.createElement("div", { className: "flex justify-between items-center border-b border-gray-800/60 pb-4 mb-6" },
+                    React.createElement("h2", { className: "text-xl font-bold", style: {color: "#a855f7"} }, "المدرب الذكي"),
+                    React.createElement("button", { onClick: onBack, className: "glass-card px-4 py-2 rounded-xl text-sm text-gray-400 btn-primary" }, "إغلاق")
                 ),
                 React.createElement("div", { className: "flex gap-2 mb-4 flex-wrap" },
                     ["بديل لـ Incline Press", "نصائح تغذية", "استشفاء بعد Lower", "تقنية Chin-Up"].map((s, i) =>
-                        React.createElement("button", { key: i, onClick: () => setQuery(s), className: "bg-gray-800 hover:bg-gray-700 px-3 py-1.5 rounded-lg text-xs text-gray-300" }, s)
+                        React.createElement("button", { key: i, onClick: () => setQuery(s), className: "glass-card hover:bg-gray-800/50 px-4 py-2 rounded-xl text-xs text-gray-300 btn-primary" }, s)
                     )
                 ),
-                React.createElement("textarea", { value: query, onChange: e => setQuery(e.target.value), placeholder: "اسأل المدرب الذكي...", className: "w-full h-24 bg-gray-900 border border-gray-800 rounded-xl p-4 text-right text-sm text-white focus:outline-none focus:border-purple-500 mb-4", dir: "rtl" }),
-                React.createElement("button", { onClick: askAI, disabled: loading, className: "w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-900 p-3 rounded-xl font-bold text-white mb-6" }, loading ? "جاري التحليل..." : "اسأل المدرب"),
-                response && React.createElement("div", { className: "bg-gray-900 border border-gray-800 rounded-xl p-4 fade-in" },
+                React.createElement("textarea", { value: query, onChange: e => setQuery(e.target.value), placeholder: "اسأل المدرب الذكي...", className: "w-full h-24 bg-gray-900/50 border border-gray-800/60 rounded-2xl p-4 text-right text-sm text-white focus:outline-none focus:border-purple-500/50 mb-4", dir: "rtl" }),
+                React.createElement("button", { onClick: askAI, disabled: loading, className: "w-full btn-primary p-4 rounded-2xl font-bold text-white mb-6 disabled:opacity-50", style: {background: loading ? "#3b0764" : "linear-gradient(135deg, #a855f7, #7c3aed)"} }, loading ? "جاري التحليل..." : "اسأل المدرب"),
+                response && React.createElement("div", { className: "glass-card rounded-2xl p-5 fade-in" },
                     React.createElement("div", { className: "text-gray-200 text-sm leading-relaxed whitespace-pre-line" }, response)
                 ),
-                React.createElement("div", { className: "mt-6 bg-gray-900 border border-gray-800 rounded-xl p-4" },
-                    React.createElement("h3", { className: "text-gray-400 text-xs font-bold mb-3" }, "التمارين المتاحة للاستبدال"),
-                    React.createElement("div", { className: "flex flex-wrap gap-2" }, exerciseNames.map((name, i) => React.createElement("span", { key: i, className: "bg-gray-800 px-2 py-1 rounded text-xs text-gray-400" }, name)))
+                React.createElement("div", { className: "mt-6 glass-card rounded-2xl p-5" },
+                    React.createElement("h3", { className: "text-gray-500 text-xs font-bold mb-3" }, "التمارين المتاحة للاستبدال"),
+                    React.createElement("div", { className: "flex flex-wrap gap-2" }, exerciseNames.map((name, i) => React.createElement("span", { key: i, className: "bg-gray-800/50 px-3 py-1.5 rounded-lg text-xs text-gray-400" }, name)))
                 )
             );
         }
@@ -518,49 +939,128 @@
             const history = getStorage();
             const p = getProfile() || DEFAULT_PROFILE;
             const workouts = getCustomWorkouts();
-            return React.createElement("div", { className: "min-h-screen text-right safe-top safe-bottom", style: {background:"#0a0f1a"} },
-                React.createElement("div", { style: {background:"linear-gradient(135deg,#1e293b,#0f172a)",padding:"20px 16px 16px",borderBottom:"1px solid #1e293b"} },
-                    React.createElement("div", { style: {display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14} },
+
+            return React.createElement("div", { className: "min-h-screen text-right safe-top safe-bottom", style: {background:"#070a13"} },
+                // Hero Header
+                React.createElement("div", { 
+                    style: {
+                        background: "linear-gradient(180deg, #0f172a 0%, #070a13 100%)",
+                        padding: "24px 20px 20px", borderBottom: "1px solid rgba(148,163,184,0.06)"
+                    } 
+                },
+                    React.createElement("div", { style: {display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:20} },
                         React.createElement("div", { className: "flex gap-2" },
-                            React.createElement("button", { onClick: () => onSelect("__profile__"), style: {background:"#1e293b",border:"1px solid #334155",borderRadius:10,padding:"8px 12px",color:"#94a3b8",cursor:"pointer",fontSize:12} }, "⚙️ بياناتي"),
-                            React.createElement("button", { onClick: () => onSelect("__ai__"), style: {background:"#3b0764",border:"1px solid #a855f733",borderRadius:10,padding:"8px 12px",color:"#a855f7",cursor:"pointer",fontSize:12} }, "🧠 مدربي")
+                            React.createElement("button", { 
+                                onClick: () => onSelect("__profile__"), 
+                                className: "glass-card px-4 py-2.5 rounded-xl text-xs text-gray-400 btn-primary",
+                                style: {display: "flex", alignItems: "center", gap: 6}
+                            }, "⚙️", React.createElement("span", null, "بياناتي")),
+                            React.createElement("button", { 
+                                onClick: () => onSelect("__ai__"), 
+                                className: "btn-primary px-4 py-2.5 rounded-xl text-xs",
+                                style: {background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.2)", color: "#a855f7", display: "flex", alignItems: "center", gap: 6}
+                            }, "🧠", React.createElement("span", null, "مدربي"))
                         ),
-                        React.createElement("div", null,
-                            React.createElement("div", { style: {color:"#64748b",fontSize:11,letterSpacing:1} }, "مرحباً"),
-                            React.createElement("div", { style: {color:"#f8fafc",fontWeight:800,fontSize:20} }, p.name + " 💪"),
-                            React.createElement("div", { style: {color:"#64748b",fontSize:12,marginTop:2} }, TODAY_AR)
+                        React.createElement("div", { style: {textAlign: "right"} },
+                            React.createElement("div", { style: {color:"#475569",fontSize:11,letterSpacing:2, textTransform: "uppercase"} }, "مرحباً"),
+                            React.createElement("div", { style: {color:"#f8fafc",fontWeight:800,fontSize:24, marginTop: 2} }, p.name + " 💪"),
+                            React.createElement("div", { style: {color:"#475569",fontSize:12,marginTop:4} }, TODAY_AR)
                         )
                     ),
-                    React.createElement("div", { style: {display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8} },
-                        [["جلسات",history.length,"#a855f7"],["الدهون",p.fat+"%","#f97316"],["العضلات",p.muscle+"kg","#22c55e"],["الوزن",p.weight+"kg","#3b82f6"]].map(([l,v,c]) =>
-                            React.createElement("div", { key: l, style: {background:"#0f172a",borderRadius:10,padding:"8px 6px",textAlign:"center"} },
-                                React.createElement("div", { style: {color:"#475569",fontSize:9,marginBottom:3} }, l),
-                                React.createElement("div", { style: {color:c,fontWeight:700,fontSize:13} }, v)
+
+                    // Stats Grid
+                    React.createElement("div", { style: {display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:10} },
+                        [
+                            {label: "جلسات", value: history.length, color: "#a855f7", icon: "🔥"},
+                            {label: "الدهون", value: p.fat+"%", color: "#f97316", icon: "📊"},
+                            {label: "العضلات", value: p.muscle+"kg", color: "#22c55e", icon: "💪"},
+                            {label: "الوزن", value: p.weight+"kg", color: "#3b82f6", icon: "⚖️"}
+                        ].map((stat, i) =>
+                            React.createElement("div", { 
+                                key: i, 
+                                className: "fade-in-up stagger-" + (i + 1),
+                                style: {
+                                    background: "rgba(15,23,42,0.5)",
+                                    borderRadius: 16, padding: "12px 8px",
+                                    textAlign: "center", border: "1px solid rgba(148,163,184,0.06)",
+                                    backdropFilter: "blur(10px)"
+                                } 
+                            },
+                                React.createElement("div", { style: {fontSize: 20, marginBottom: 4} }, stat.icon),
+                                React.createElement("div", { style: {color: stat.color, fontWeight: 800, fontSize: 15, marginBottom: 2} }, stat.value),
+                                React.createElement("div", { style: {color:"#475569", fontSize: 9, letterSpacing: 0.5} }, stat.label)
                             )
                         )
                     )
                 ),
-                React.createElement("div", { style: {padding:"20px 16px"} },
-                    React.createElement("div", { className: "flex justify-between items-center mb-3" },
+
+                // Workouts Section
+                React.createElement("div", { style: {padding: "24px 20px"} },
+                    React.createElement("div", { className: "flex justify-between items-center mb-5" },
                         React.createElement("div", { className: "flex gap-2" },
-                            React.createElement("button", { onClick: () => onSelect("__sync__"), className: "bg-blue-600/10 border border-blue-500/20 text-blue-400 px-3 py-1.5 rounded-xl text-xs font-bold" }, "🤖 تحديث Gemini"),
-                            React.createElement("button", { onClick: () => onSelect("__export__"), className: "bg-green-600/10 border border-green-500/20 text-green-400 px-3 py-1.5 rounded-xl text-xs font-bold" }, "💾 نسخ احتياطي")
+                            React.createElement("button", { 
+                                onClick: () => onSelect("__sync__"), 
+                                className: "btn-primary px-4 py-2 rounded-xl text-xs font-bold",
+                                style: {background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.15)", color: "#3b82f6"}
+                            }, "🤖 Gemini"),
+                            React.createElement("button", { 
+                                onClick: () => onSelect("__export__"), 
+                                className: "btn-primary px-4 py-2 rounded-xl text-xs font-bold",
+                                style: {background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.15)", color: "#22c55e"}
+                            }, "💾 نسخ")
                         ),
-                        React.createElement("div", { style: {color:"#475569",fontSize:12,letterSpacing:1} }, "اختر تدريب اليوم")
+                        React.createElement("div", { style: {color:"#475569", fontSize: 12, fontWeight: 600, letterSpacing: 1} }, "اختر تدريب اليوم")
                     ),
-                    React.createElement("div", { style: {display:"grid",gridTemplateColumns:"1fr 1fr",gap:12} },
-                        Object.keys(workouts).map(name => {
+
+                    React.createElement("div", { style: {display:"grid", gridTemplateColumns: "1fr 1fr", gap: 12} },
+                        Object.keys(workouts).map((name, i) => {
                             const c = C[name];
                             const sessions = history.filter(h => h.workout === name);
                             const lastW = sessions.length > 0 ? sessions[sessions.length-1].date : null;
-                            return React.createElement("button", { key: name, onClick: () => onSelect(name), style: {background:c.bg,border:"1.5px solid "+c.accent+"33",borderRadius:18,padding:"20px 14px",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:8,boxShadow:"0 4px 20px rgba(0,0,0,0.4)"} },
-                                React.createElement("span", { style: {fontSize:28} }, c.emoji),
-                                React.createElement("span", { style: {color:"#f8fafc",fontWeight:700,fontSize:14} }, name),
-                                React.createElement("span", { style: {color:c.accent,fontSize:10} }, sessions.length > 0 ? "آخر مرة: "+lastW : workouts[name].length+" تمارين")
+                            return React.createElement("button", { 
+                                key: name, 
+                                onClick: () => onSelect(name),
+                                className: "btn-primary fade-in-up stagger-" + (i + 1),
+                                style: {
+                                    background: c.gradient,
+                                    border: "1px solid " + c.accent + "22",
+                                    borderRadius: 20, padding: "24px 16px",
+                                    cursor: "pointer", display: "flex",
+                                    flexDirection: "column", alignItems: "center",
+                                    gap: 10,
+                                    boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)"
+                                } 
+                            },
+                                React.createElement("div", { 
+                                    style: {
+                                        width: 52, height: 52, borderRadius: 16,
+                                        background: "rgba(255,255,255,0.08)",
+                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                        fontSize: 26, backdropFilter: "blur(10px)",
+                                        border: "1px solid rgba(255,255,255,0.06)"
+                                    } 
+                                }, c.emoji),
+                                React.createElement("span", { style: {color:"#f8fafc", fontWeight: 800, fontSize: 15} }, name),
+                                React.createElement("span", { style: {color: c.accent + "aa", fontSize: 10, fontWeight: 500} }, 
+                                    sessions.length > 0 ? "آخر مرة: " + lastW : workouts[name].length + " تمارين"
+                                )
                             );
                         })
                     ),
-                    React.createElement("button", { onClick: () => onSelect("__history__"), style: {width:"100%",marginTop:14,background:"transparent",border:"1px solid #1e293b",borderRadius:12,padding:"12px",color:"#64748b",cursor:"pointer",fontSize:13,fontWeight:600} }, "📊 السجل والتحليل")
+
+                    React.createElement("button", { 
+                        onClick: () => onSelect("__history__"), 
+                        className: "btn-primary fade-in-up stagger-5",
+                        style: {
+                            width: "100%", marginTop: 16,
+                            background: "rgba(15,23,42,0.4)",
+                            border: "1px solid rgba(148,163,184,0.08)",
+                            borderRadius: 16, padding: "14px",
+                            color: "#64748b", cursor: "pointer",
+                            fontSize: 14, fontWeight: 600,
+                            backdropFilter: "blur(10px)"
+                        } 
+                    }, "📊 السجل والتحليل التراكمي")
                 )
             );
         }
@@ -570,31 +1070,77 @@
             const [form, setForm] = useState({ weight: saved.weight, muscle: saved.muscle, fat: saved.fat, visceralFat: saved.visceralFat, restSeconds: saved.restSeconds || 90, rpeEnabled: saved.rpeEnabled !== false });
             const [done, setDone] = useState(false);
             const handleSave = () => { saveProfile({...DEFAULT_PROFILE, ...form}); setDone(true); setTimeout(onBack, 1200); };
-            return React.createElement("div", { className: "min-h-screen text-right safe-top safe-bottom", style: {background:"#0a0f1a"} },
-                React.createElement("div", { style: {background:"#1e293b",padding:"20px 16px",borderBottom:"1px solid #334155",display:"flex",alignItems:"center",justifyContent:"space-between"} },
-                    React.createElement("div", { style: {color:"#f8fafc",fontWeight:800,fontSize:18} }, "⚙️ بياناتي الجسمانية"),
-                    React.createElement("button", { onClick: onBack, style: {background:"rgba(255,255,255,0.08)",border:"none",borderRadius:8,padding:"7px 11px",color:"#e2e8f0",cursor:"pointer",fontSize:15} }, "→")
+
+            return React.createElement("div", { className: "min-h-screen text-right safe-top safe-bottom", style: {background:"#070a13"} },
+                React.createElement("div", { 
+                    style: {
+                        background: "linear-gradient(180deg, #0f172a, #070a13)",
+                        padding: "20px 20px 16px", borderBottom: "1px solid rgba(148,163,184,0.06)",
+                        display: "flex", alignItems: "center", justifyContent: "space-between"
+                    } 
+                },
+                    React.createElement("div", { style: {color:"#f8fafc", fontWeight: 800, fontSize: 18} }, "⚙️ بياناتي الجسمانية"),
+                    React.createElement("button", { 
+                        onClick: onBack, 
+                        className: "glass-card btn-primary",
+                        style: {border: "none", borderRadius: 10, padding: "8px 14px", color: "#94a3b8", cursor: "pointer", fontSize: 15} 
+                    }, "→")
                 ),
-                React.createElement("div", { style: {padding:20} },
-                    React.createElement("div", { style: {background:"#1e293b",borderRadius:16,padding:16,marginBottom:16,border:"1px solid #334155"} },
+                React.createElement("div", { style: {padding: 20} },
+                    React.createElement("div", { className: "glass-card rounded-2xl p-5 mb-4" },
                         [["weight","الوزن الكلي (kg)"],["muscle","الكتلة العضلية (kg)"],["fat","الدهون (%)"],["visceralFat","الدهون الحشوية (Visceral)"]].map(([k,l]) =>
-                            React.createElement("div", { key: k, style: {marginBottom:14} },
-                                React.createElement("label", { style: {color:"#94a3b8",fontSize:12,display:"block",marginBottom:6} }, l),
-                                React.createElement("input", { type: "number", step: "0.1", value: form[k], onChange: e => setForm(f => ({...f, [k]: parseFloat(e.target.value) || 0})), style: {width:"100%",background:"#0f172a",border:"1px solid #334155",borderRadius:10,padding:"12px 14px",color:"#f8fafc",fontSize:16,fontWeight:700,boxSizing:"border-box",outline:"none",textAlign:"right"} })
+                            React.createElement("div", { key: k, style: {marginBottom: 16} },
+                                React.createElement("label", { style: {color:"#64748b", fontSize: 12, display: "block", marginBottom: 8, fontWeight: 500} }, l),
+                                React.createElement("input", { 
+                                    type: "number", step: "0.1", value: form[k], 
+                                    onChange: e => setForm(f => ({...f, [k]: parseFloat(e.target.value) || 0})), 
+                                    style: {
+                                        width: "100%", background: "rgba(15,23,42,0.6)",
+                                        border: "1px solid rgba(148,163,184,0.1)", borderRadius: 12,
+                                        padding: "14px 16px", color: "#f8fafc", fontSize: 17,
+                                        fontWeight: 700, boxSizing: "border-box", outline: "none", textAlign: "right"
+                                    } 
+                                })
                             )
                         ),
-                        React.createElement("div", { style: {marginBottom:14} },
-                            React.createElement("label", { style: {color:"#94a3b8",fontSize:12,display:"block",marginBottom:6} }, "⏱️ وقت الراحة بين المجموعات (ثانية)"),
-                            React.createElement("input", { type: "number", value: form.restSeconds, onChange: e => setForm(f => ({...f, restSeconds: parseInt(e.target.value) || 90})), style: {width:"100%",background:"#0f172a",border:"1px solid #334155",borderRadius:10,padding:"12px 14px",color:"#f8fafc",fontSize:16,fontWeight:700,boxSizing:"border-box",outline:"none",textAlign:"right"} })
+                        React.createElement("div", { style: {marginBottom: 16} },
+                            React.createElement("label", { style: {color:"#64748b", fontSize: 12, display: "block", marginBottom: 8, fontWeight: 500} }, "⏱️ وقت الراحة بين المجموعات (ثانية)"),
+                            React.createElement("input", { 
+                                type: "number", value: form.restSeconds, 
+                                onChange: e => setForm(f => ({...f, restSeconds: parseInt(e.target.value) || 90})), 
+                                style: {
+                                    width: "100%", background: "rgba(15,23,42,0.6)",
+                                    border: "1px solid rgba(148,163,184,0.1)", borderRadius: 12,
+                                    padding: "14px 16px", color: "#f8fafc", fontSize: 17,
+                                    fontWeight: 700, boxSizing: "border-box", outline: "none", textAlign: "right"
+                                } 
+                            })
                         ),
-                        React.createElement("div", { style: {display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0"} },
-                            React.createElement("label", { style: {color:"#94a3b8",fontSize:12} }, "📊 تفعيل تقييم RPE (الشدة)"),
-                            React.createElement("button", { onClick: () => setForm(f => ({...f, rpeEnabled: !f.rpeEnabled})), style: {width:50,height:26,borderRadius:13,background:form.rpeEnabled ? "#22c55e" : "#334155",border:"none",cursor:"pointer",position:"relative"} },
-                                React.createElement("div", { style: {position:"absolute",top:3,right:form.rpeEnabled ? 3 : 27,width:20,height:20,borderRadius:10,background:"#fff",transition:"right 0.2s"} })
+                        React.createElement("div", { style: {display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0"} },
+                            React.createElement("label", { style: {color: "#64748b", fontSize: 12, fontWeight: 500} }, "📊 تفعيل تقييم RPE (الشدة)"),
+                            React.createElement("button", { 
+                                onClick: () => setForm(f => ({...f, rpeEnabled: !f.rpeEnabled})), 
+                                style: {
+                                    width: 52, height: 28, borderRadius: 14,
+                                    background: form.rpeEnabled ? "#22c55e" : "#334155",
+                                    border: "none", cursor: "pointer", position: "relative",
+                                    transition: "background 0.3s"
+                                } 
+                            },
+                                React.createElement("div", { style: {position: "absolute", top: 3, right: form.rpeEnabled ? 3 : 27, width: 22, height: 22, borderRadius: 11, background: "#fff", transition: "right 0.3s cubic-bezier(0.4, 0, 0.2, 1)"} })
                             )
                         )
                     ),
-                    React.createElement("button", { onClick: handleSave, style: {width:"100%",background:done?"#22c55e":"#3b82f6",border:"none",borderRadius:12,padding:14,color:"#fff",cursor:"pointer",fontSize:15,fontWeight:700} }, done ? "✅ تم الحفظ!" : "💾 حفظ البيانات")
+                    React.createElement("button", { 
+                        onClick: handleSave, 
+                        className: "btn-primary",
+                        style: {
+                            width: "100%", background: done ? "#22c55e" : "linear-gradient(135deg, #3b82f6, #2563eb)",
+                            border: "none", borderRadius: 16, padding: 16,
+                            color: "#fff", cursor: "pointer", fontSize: 16, fontWeight: 700,
+                            boxShadow: done ? "0 8px 24px rgba(34,197,94,0.3)" : "0 8px 24px rgba(59,130,246,0.25)"
+                        } 
+                    }, done ? "✅ تم الحفظ بنجاح!" : "💾 حفظ البيانات")
                 )
             );
         }
@@ -610,26 +1156,29 @@
                 if (result.success) { setStatus("✅ تم استيراد " + result.count + " جلسة!"); setTimeout(() => window.location.reload(), 1500); }
                 else { setStatus("❌ فشل: " + result.error); }
             };
-            return React.createElement("div", { className: "min-h-screen text-right p-4 safe-top safe-bottom", style: {background:"#0a0f1a"} },
-                React.createElement("div", { className: "flex justify-between items-center border-b border-gray-800 pb-4 mb-6" },
-                    React.createElement("h2", { className: "text-xl font-bold text-green-500" }, "💾 نسخ احتياطي واستيراد"),
-                    React.createElement("button", { onClick: onBack, className: "bg-gray-800 px-3 py-1.5 rounded-lg text-sm text-gray-400" }, "إغلاق")
+            return React.createElement("div", { className: "min-h-screen text-right p-4 safe-top safe-bottom", style: {background:"#070a13"} },
+                React.createElement("div", { className: "flex justify-between items-center border-b border-gray-800/60 pb-4 mb-6" },
+                    React.createElement("h2", { className: "text-xl font-bold", style: {color: "#22c55e"} }, "💾 نسخ احتياطي واستيراد"),
+                    React.createElement("button", { onClick: onBack, className: "glass-card px-4 py-2 rounded-xl text-sm text-gray-400 btn-primary" }, "إغلاق")
                 ),
-                React.createElement("div", { className: "bg-green-950/30 border border-green-900 rounded-xl p-4 mb-4" },
-                    React.createElement("p", { className: "text-green-400 text-sm font-bold mb-2" }, "📊 بياناتك الحالية:"),
-                    React.createElement("p", { className: "text-green-300 text-xs" }, "• الجلسات المسجلة: " + history.length),
-                    React.createElement("p", { className: "text-green-300 text-xs" }, "• آخر تحديث: " + (history.length > 0 ? history[history.length-1].date : "—"))
+                React.createElement("div", { className: "glass-card rounded-2xl p-5 mb-4" },
+                    React.createElement("p", { className: "text-green-400/80 text-sm font-bold mb-3" }, "📊 بياناتك الحالية:"),
+                    React.createElement("p", { className: "text-green-300/70 text-xs mb-1" }, "• الجلسات المسجلة: " + history.length),
+                    React.createElement("p", { className: "text-green-300/70 text-xs" }, "• آخر تحديث: " + (history.length > 0 ? history[history.length-1].date : "—"))
                 ),
-                React.createElement("button", { onClick: handleExport, className: "w-full bg-green-600 hover:bg-green-700 p-3 rounded-xl font-bold text-white mb-6" }, "📥 تصدير البيانات (JSON)"),
-                React.createElement("div", { className: "border-t border-gray-800 pt-4" },
-                    React.createElement("p", { className: "text-gray-400 text-sm font-bold mb-3" }, "📤 استيراد من ملف:"),
-                    React.createElement("textarea", { value: importText, onChange: e => setImportText(e.target.value), placeholder: "الصق محتوى ملف JSON هنا...", className: "w-full h-32 bg-gray-900 border border-gray-800 rounded-xl p-4 text-right text-xs text-white focus:outline-none focus:border-green-500 mb-4", dir: "ltr" }),
-                    React.createElement("button", { onClick: handleImport, className: "w-full bg-gray-700 hover:bg-gray-600 p-3 rounded-xl font-bold text-white" }, "📤 استيراد البيانات")
+                React.createElement("button", { onClick: handleExport, className: "w-full btn-primary p-4 rounded-2xl font-bold text-white mb-6", style: {background: "linear-gradient(135deg, #22c55e, #16a34a)"} }, "📥 تصدير البيانات (JSON)"),
+                React.createElement("div", { className: "border-t border-gray-800/60 pt-5" },
+                    React.createElement("p", { className: "text-gray-500 text-sm font-bold mb-3" }, "📤 استيراد من ملف:"),
+                    React.createElement("textarea", { value: importText, onChange: e => setImportText(e.target.value), placeholder: "الصق محتوى ملف JSON هنا...", className: "w-full h-32 bg-gray-900/50 border border-gray-800/60 rounded-2xl p-4 text-right text-xs text-white focus:outline-none focus:border-green-500/50 mb-4", dir: "ltr" }),
+                    React.createElement("button", { onClick: handleImport, className: "w-full btn-primary p-4 rounded-2xl font-bold text-white", style: {background: "#334155"} }, "📤 استيراد البيانات")
                 ),
-                status && React.createElement("div", { className: "mt-4 p-3 rounded-xl text-center text-sm " + (status.includes("✅") ? "bg-green-950/40 border border-green-900 text-green-400" : "bg-red-950/40 border border-red-900 text-red-400") }, status)
+                status && React.createElement("div", { className: "mt-4 p-4 rounded-2xl text-center text-sm " + (status.includes("✅") ? "glass-card border-green-500/30 text-green-400" : "glass-card border-red-500/30 text-red-400") }, status)
             );
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // WORKOUT SCREEN v6.0 — With Exercise Substitution
+        // ═══════════════════════════════════════════════════════════════
         function WorkoutScreen({workoutName, onFinish, onBack}) {
             const c = C[workoutName];
             const profile = getProfile() || DEFAULT_PROFILE;
@@ -641,20 +1190,15 @@
             const [showGif, setShowGif] = useState(true);
             const [timer, setTimer] = useState({active: false, seconds: 0, exIdx: null, setIdx: null});
             const [audioReady, setAudioReady] = useState(false);
+            const bgTimerRef = useRef(null);
             const [rest, setRest] = useState({active: false, seconds: restDuration});
             const restSecondsRef = useRef(restDuration);
             const [rpeModal, setRpeModal] = useState({show: false, exIdx: null, setIdx: null});
 
-            useEffect(() => {
-                let iv;
-                if (timer.active) iv = setInterval(() => setTimer(t => ({...t, seconds: t.seconds + 1})), 1000);
-                return () => clearInterval(iv);
-            }, [timer.active]);
+            // Substitution modal state
+            const [subModal, setSubModal] = useState({show: false, exIdx: null});
 
-            // ====== FIXED: Background timer that survives lock screen ======
-            const bgTimerRef = useRef(null);
-
-            // Check for running timer on mount (if app was backgrounded)
+            // Check for running timer on mount
             useEffect(() => {
                 const savedActive = localStorage.getItem('wt_timer_active');
                 if (savedActive === 'true') {
@@ -672,11 +1216,16 @@
                 }
             }, []);
 
+            useEffect(() => {
+                let iv;
+                if (timer.active) iv = setInterval(() => setTimer(t => ({...t, seconds: t.seconds + 1})), 1000);
+                return () => clearInterval(iv);
+            }, [timer.active]);
+
             const startBackgroundTimer = (seconds, fullDuration) => {
                 if (bgTimerRef.current) {
                     bgTimerRef.current.stop();
                 }
-
                 bgTimerRef.current = new BackgroundTimer();
                 bgTimerRef.current.start(
                     seconds,
@@ -737,6 +1286,53 @@
                 setRpeModal({show: false, exIdx: null, setIdx: null});
             };
 
+            // ====== EXERCISE SUBSTITUTION ======
+            const handleSubstitute = (exIdx, newName) => {
+                const altData = EXERCISE_GIFS[newName];
+                const oldEx = data[exIdx];
+
+                // Find default workout data for the new exercise if available
+                let newExData = null;
+                Object.values(DEFAULT_WORKOUTS).forEach(workout => {
+                    const found = workout.find(e => e.name === newName);
+                    if (found) newExData = found;
+                });
+
+                // If not in defaults, create basic structure
+                if (!newExData) {
+                    newExData = {
+                        name: newName,
+                        type: oldEx.type,
+                        unit: oldEx.unit,
+                        startWeight: oldEx.startWeight,
+                        cue: altData?.muscle || newName,
+                        tips: ["ركز على النموذج الصحيح", "تحكم في الوزن"],
+                        muscles: altData?.muscle || "",
+                        safety: "تجنب المرجحة والغش",
+                        rpe: oldEx.rpe
+                    };
+                }
+
+                setData(d => d.map((ex, i) => {
+                    if (i !== exIdx) return ex;
+                    return {
+                        ...ex,
+                        name: newExData.name,
+                        cue: newExData.cue,
+                        tips: newExData.tips,
+                        muscles: newExData.muscles,
+                        safety: newExData.safety,
+                        rpe: newExData.rpe,
+                        // Keep sets data but reset done status
+                        sets: ex.sets.map(s => ({...s, done: false, rpe: null}))
+                    };
+                }));
+
+                setSubModal({show: false, exIdx: null});
+                setShowGif(true);
+                setShowTips(false);
+            };
+
             const handleFinish = () => {
                 const h = getStorage();
                 const mins = Math.round((Date.now() - startTime.current) / 60000);
@@ -751,132 +1347,412 @@
             const pct = Math.round((progress / total) * 100);
             const ex = data[activeEx];
 
-            return React.createElement("div", { className: "min-h-screen text-right pb-8 safe-top", style: {background: "#0a0f1a"} },
-                React.createElement("div", { style: {background: c.bg, padding: "16px 16px 14px", borderBottom: "2px solid " + c.accent + "33"} },
-                    React.createElement("div", { style: {display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10} },
+            return React.createElement("div", { className: "min-h-screen text-right pb-8 safe-top", style: {background: "#070a13"} },
+                // Header
+                React.createElement("div", { 
+                    style: {
+                        background: c.gradient,
+                        padding: "16px 16px 14px",
+                        borderBottom: "1px solid " + c.accent + "15"
+                    } 
+                },
+                    React.createElement("div", { style: {display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12} },
                         React.createElement("div", { style: {textAlign: "left"} },
-                            React.createElement("div", { style: {color: "#fff", fontWeight: 800, fontSize: 20} }, pct + "%"),
-                            React.createElement("div", { style: {color: "#64748b", fontSize: 11} }, progress + "/" + total)
+                            React.createElement("div", { style: {color: "#fff", fontWeight: 800, fontSize: 22} }, pct + "%"),
+                            React.createElement("div", { style: {color: "rgba(255,255,255,0.4)", fontSize: 11} }, progress + "/" + total)
                         ),
-                        React.createElement("div", { style: {flex: 1, paddingRight: 10} },
-                            React.createElement("div", { style: {color: c.accent, fontSize: 11, letterSpacing: 1} }, c.emoji + " " + TODAY_AR.split("،")[0]),
-                            React.createElement("div", { style: {color: "#f8fafc", fontWeight: 800, fontSize: 18} }, workoutName)
+                        React.createElement("div", { style: {flex: 1, paddingRight: 14} },
+                            React.createElement("div", { style: {color: c.accent + "aa", fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase"} }, c.emoji + " " + TODAY_AR.split("،")[0]),
+                            React.createElement("div", { style: {color: "#f8fafc", fontWeight: 800, fontSize: 19} }, workoutName)
                         ),
-                        React.createElement("button", { onClick: onBack, style: {background: "rgba(255,255,255,0.1)", border: "none", borderRadius: 8, padding: "7px 11px", color: "#e2e8f0", cursor: "pointer", fontSize: 15} }, "→")
+                        React.createElement("button", { 
+                            onClick: onBack, 
+                            className: "btn-primary",
+                            style: {background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 10, padding: "8px 12px", color: "#e2e8f0", cursor: "pointer", fontSize: 15} 
+                        }, "→")
                     ),
+
+                    // Audio init button
                     React.createElement("div", { className: "mb-3" },
-                        React.createElement("button", { onClick: initAudio, className: "w-full p-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 " + (audioReady ? "bg-green-600/20 text-green-400 border border-green-500/30" : "bg-amber-600 text-white border border-amber-500 animate-pulse") },
+                        React.createElement("button", { 
+                            onClick: initAudio, 
+                            className: "w-full btn-primary p-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 " + (audioReady ? "" : "animate-pulse"),
+                            style: audioReady 
+                                ? {background: c.accent + "18", color: c.accent, border: "1px solid " + c.accent + "30"}
+                                : {background: "#f59e0b", color: "#fff", border: "1px solid #f59e0b"}
+                        },
                             audioReady ? "🔊 الصوت مفعل (اضغط للاختبار)" : "⚠️ اضغط هنا لتفعيل الصوت والاهتزاز (إلزامي)"
                         )
                     ),
-                    React.createElement("div", { style: {background: "rgba(255,255,255,0.1)", borderRadius: 99, height: 4} },
-                        React.createElement("div", { style: {background: c.accent, borderRadius: 99, height: 4, width: pct + "%", transition: "width 0.4s"} })
+
+                    // Progress bar
+                    React.createElement("div", { style: {background: "rgba(255,255,255,0.06)", borderRadius: 99, height: 4, overflow: "hidden"} },
+                        React.createElement("div", { 
+                            style: {
+                                background: "linear-gradient(90deg, " + c.accent + ", " + c.accent + "aa)",
+                                borderRadius: 99, height: 4, width: pct + "%",
+                                transition: "width 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                                boxShadow: "0 0 12px " + c.accent + "44"
+                            } 
+                        })
                     ),
-                    React.createElement("div", { style: {display: "flex", gap: 6, marginTop: 10, overflowX: "auto", paddingBottom: 2, flexDirection: "row-reverse"} },
+
+                    // Exercise tabs
+                    React.createElement("div", { style: {display: "flex", gap: 6, marginTop: 12, overflowX: "auto", paddingBottom: 4, flexDirection: "row-reverse"} },
                         data.map((exItem, i) => {
                             const done = exItem.sets.every(s => s.done);
-                            return React.createElement("button", { key: i, onClick: () => { initAudio(); setActiveEx(i); setShowTips(false); setShowGif(true); }, style: {background: i === activeEx ? c.accent : done ? c.accent + "22" : "rgba(255,255,255,0.07)", border: "none", borderRadius: 20, padding: "5px 11px", color: i === activeEx ? "#fff" : done ? c.accent : "#94a3b8", cursor: "pointer", fontSize: 11, whiteSpace: "nowrap", fontWeight: 600, flexShrink: 0} },
+                            return React.createElement("button", { 
+                                key: i, 
+                                onClick: () => { initAudio(); setActiveEx(i); setShowTips(false); setShowGif(true); },
+                                className: "btn-primary",
+                                style: {
+                                    background: i === activeEx ? c.accent : done ? c.accent + "15" : "rgba(255,255,255,0.05)",
+                                    border: "none", borderRadius: 20,
+                                    padding: "6px 14px",
+                                    color: i === activeEx ? "#fff" : done ? c.accent : "#64748b",
+                                    cursor: "pointer", fontSize: 11, whiteSpace: "nowrap",
+                                    fontWeight: 600, flexShrink: 0,
+                                    boxShadow: i === activeEx ? "0 4px 16px " + c.accent + "33" : "none"
+                                } 
+                            },
                                 (done ? "✓ " : "") + exItem.name
                             );
                         })
                     )
                 ),
+
+                // Exercise Card
                 React.createElement("div", { style: {padding: "14px 16px"} },
-                    React.createElement("div", { style: {background: "#1e293b", borderRadius: 18, padding: 16, border: "1px solid " + c.accent + "22", marginBottom: 12} },
-                        React.createElement("div", { style: {display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8, flexDirection: "row-reverse"} },
-                            React.createElement("div", null,
-                                React.createElement("h2", { style: {color: "#f8fafc", fontSize: 16, fontWeight: 700, margin: "0 0 3px"} }, ex.name),
+                    React.createElement("div", { 
+                        className: "glass-card-strong fade-in-up",
+                        style: {
+                            borderRadius: 20, padding: 18,
+                            border: "1px solid " + c.accent + "15",
+                            marginBottom: 12,
+                            boxShadow: "0 8px 32px rgba(0,0,0,0.3), 0 0 20px " + c.glow
+                        } 
+                    },
+                        // Exercise header with substitute button
+                        React.createElement("div", { style: {display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12, flexDirection: "row-reverse"} },
+                            React.createElement("div", { style: {flex: 1} },
+                                React.createElement("h2", { style: {color: "#f8fafc", fontSize: 17, fontWeight: 800, margin: "0 0 4px"} }, ex.name),
                                 React.createElement("div", { style: {color: c.accent, fontSize: 11, fontWeight: 600} }, ex.cue),
-                                ex.rpe && React.createElement("div", { style: {color: "#64748b", fontSize: 10, marginTop: 2} }, "🎯 RPE هدف: " + ex.rpe + "/10")
+                                ex.rpe && React.createElement("div", { style: {color: "#475569", fontSize: 10, marginTop: 4} }, "🎯 RPE هدف: " + ex.rpe + "/10")
                             ),
-                            React.createElement("div", { style: {display: "flex", gap: 6} },
-                                React.createElement("button", { onClick: () => { initAudio(); setShowGif(!showGif); }, style: {background: showGif ? c.accent : "rgba(255,255,255,0.07)", border: "none", borderRadius: 8, padding: "6px 10px", color: showGif ? "#fff" : "#64748b", cursor: "pointer", fontSize: 11} }, "🎬"),
-                                React.createElement("button", { onClick: () => { initAudio(); setShowTips(!showTips); }, style: {background: showTips ? c.accent : "rgba(255,255,255,0.07)", border: "none", borderRadius: 8, padding: "6px 10px", color: showTips ? "#fff" : "#64748b", cursor: "pointer", fontSize: 11} }, "💡")
+                            React.createElement("div", { style: {display: "flex", gap: 6, flexShrink: 0} },
+                                // Substitute button
+                                React.createElement("button", { 
+                                    onClick: () => { initAudio(); setSubModal({show: true, exIdx: activeEx}); },
+                                    className: "btn-primary",
+                                    title: "استبدال التمرين",
+                                    style: {
+                                        background: "rgba(168,85,247,0.1)",
+                                        border: "1px solid rgba(168,85,247,0.2)",
+                                        borderRadius: 10, padding: "7px 10px",
+                                        color: "#a855f7", cursor: "pointer", fontSize: 13
+                                    } 
+                                }, "🔄"),
+                                React.createElement("button", { 
+                                    onClick: () => { initAudio(); setShowGif(!showGif); },
+                                    className: "btn-primary",
+                                    style: {
+                                        background: showGif ? c.accent : "rgba(255,255,255,0.05)",
+                                        border: "none", borderRadius: 10,
+                                        padding: "7px 10px",
+                                        color: showGif ? "#fff" : "#64748b",
+                                        cursor: "pointer", fontSize: 13
+                                    } 
+                                }, "🎬"),
+                                React.createElement("button", { 
+                                    onClick: () => { initAudio(); setShowTips(!showTips); },
+                                    className: "btn-primary",
+                                    style: {
+                                        background: showTips ? c.accent : "rgba(255,255,255,0.05)",
+                                        border: "none", borderRadius: 10,
+                                        padding: "7px 10px",
+                                        color: showTips ? "#fff" : "#64748b",
+                                        cursor: "pointer", fontSize: 13
+                                    } 
+                                }, "💡")
                             )
                         ),
-                        showGif && React.createElement("div", { style: {background: "#0f172a", borderRadius: 12, padding: "12px 8px", marginBottom: 12, border: "1px solid " + c.accent + "22"} },
+
+                        // GIF
+                        showGif && React.createElement("div", { 
+                            style: {
+                                background: "#0b1120",
+                                borderRadius: 16, padding: "14px 10px",
+                                marginBottom: 14,
+                                border: "1px solid " + c.accent + "12"
+                            } 
+                        },
                             React.createElement(ExerciseGif, { name: ex.name, accent: c.accent })
                         ),
-                        showTips && React.createElement("div", { style: {background: "#0f172a", borderRadius: 12, padding: 14, marginBottom: 12, border: "1px solid " + c.accent + "33"} },
-                            React.createElement("div", { style: {marginBottom: 10} },
-                                React.createElement("div", { style: {color: c.accent, fontSize: 11, fontWeight: 700, marginBottom: 4} }, "💪 العضلات المستهدفة"),
-                                React.createElement("div", { style: {color: "#e2e8f0", fontSize: 12, background: c.accent + "11", borderRadius: 8, padding: "6px 10px", whiteSpace: "pre-line"} }, ex.muscles || "—")
+
+                        // Tips
+                        showTips && React.createElement("div", { 
+                            style: {
+                                background: "#0b1120",
+                                borderRadius: 16, padding: 16,
+                                marginBottom: 14,
+                                border: "1px solid " + c.accent + "18"
+                            } 
+                        },
+                            React.createElement("div", { style: {marginBottom: 12} },
+                                React.createElement("div", { style: {color: c.accent, fontSize: 11, fontWeight: 700, marginBottom: 6} }, "💪 العضلات المستهدفة"),
+                                React.createElement("div", { style: {color: "#e2e8f0", fontSize: 12, background: c.accent + "08", borderRadius: 10, padding: "8px 12px", lineHeight: 1.6} }, ex.muscles || "—")
                             ),
-                            React.createElement("div", { style: {marginBottom: 10} },
-                                React.createElement("div", { style: {color: "#ef4444", fontSize: 11, fontWeight: 700, marginBottom: 4} }, "⚠️ تحذير السلامة"),
-                                React.createElement("div", { style: {color: "#fca5a5", fontSize: 12, background: "#450a0a", borderRadius: 8, padding: "6px 10px"} }, ex.safety || "—")
+                            React.createElement("div", { style: {marginBottom: 12} },
+                                React.createElement("div", { style: {color: "#ef4444", fontSize: 11, fontWeight: 700, marginBottom: 6} }, "⚠️ تحذير السلامة"),
+                                React.createElement("div", { style: {color: "#fca5a5", fontSize: 12, background: "rgba(239,68,68,0.08)", borderRadius: 10, padding: "8px 12px", lineHeight: 1.6} }, ex.safety || "—")
                             ),
                             ex.tips && React.createElement("div", null,
-                                React.createElement("div", { style: {color: "#22c55e", fontSize: 11, fontWeight: 700, marginBottom: 4} }, "💡 نصائح التنفيذ"),
-                                ex.tips.map((tip, ti) => React.createElement("div", { key: ti, style: {color: "#86efac", fontSize: 11, padding: "3px 0", borderBottom: ti < ex.tips.length - 1 ? "1px solid #1e293b" : "none"} }, "• " + tip))
+                                React.createElement("div", { style: {color: "#22c55e", fontSize: 11, fontWeight: 700, marginBottom: 6} }, "💡 نصائح التنفيذ"),
+                                ex.tips.map((tip, ti) => React.createElement("div", { 
+                                    key: ti, 
+                                    style: {
+                                        color: "#86efac", fontSize: 11,
+                                        padding: "5px 0",
+                                        borderBottom: ti < ex.tips.length - 1 ? "1px solid rgba(148,163,184,0.06)" : "none",
+                                        lineHeight: 1.5
+                                    } 
+                                }, "• " + tip))
                             )
                         ),
-                        ex.sets.map((set, si) => React.createElement("div", { key: si, style: {background: set.done ? c.accent + "11" : "#0f172a", borderRadius: 12, padding: 12, marginBottom: 8, border: "1px solid " + (set.done ? c.accent + "44" : "#1e293b")} },
-                            React.createElement("div", { style: {display: "flex", alignItems: "center", justifyContent: "space-between", flexDirection: "row-reverse", marginBottom: 8} },
+
+                        // Sets
+                        ex.sets.map((set, si) => React.createElement("div", { 
+                            key: si,
+                            className: "fade-in-up",
+                            style: {
+                                background: set.done ? c.accent + "08" : "#0b1120",
+                                borderRadius: 14, padding: 14,
+                                marginBottom: 10,
+                                border: "1px solid " + (set.done ? c.accent + "30" : "rgba(148,163,184,0.06)"),
+                                transition: "all 0.3s ease"
+                            } 
+                        },
+                            React.createElement("div", { style: {display: "flex", alignItems: "center", justifyContent: "space-between", flexDirection: "row-reverse", marginBottom: 10} },
                                 React.createElement("span", { style: {color: set.done ? c.accent : "#475569", fontWeight: 700, fontSize: 12} },
                                     "المجموعة " + (si + 1) + (set.rpe ? " [RPE " + set.rpe + "]" : "")
                                 ),
-                                React.createElement("button", { onClick: () => handleSetDone(activeEx, si, set), style: {background: set.done ? c.accent : "transparent", border: "2px solid " + (set.done ? c.accent : "#334155"), borderRadius: 99, width: 28, height: 28, cursor: "pointer", color: set.done ? "#fff" : "#64748b", fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center"} },
+                                React.createElement("button", { 
+                                    onClick: () => handleSetDone(activeEx, si, set),
+                                    className: "btn-primary",
+                                    style: {
+                                        background: set.done ? c.accent : "transparent",
+                                        border: "2px solid " + (set.done ? c.accent : "#334155"),
+                                        borderRadius: 99, width: 30, height: 30,
+                                        cursor: "pointer", color: set.done ? "#fff" : "#64748b",
+                                        fontSize: 12, display: "flex",
+                                        alignItems: "center", justifyContent: "center",
+                                        boxShadow: set.done ? "0 4px 12px " + c.accent + "44" : "none"
+                                    } 
+                                },
                                     set.done ? "✓" : "○"
                                 )
                             ),
-                            ex.type === "reps" ? React.createElement("div", { style: {display: "grid", gridTemplateColumns: "1fr 68px 1fr", gap: 8} },
+                            ex.type === "reps" ? React.createElement("div", { style: {display: "grid", gridTemplateColumns: "1fr 68px 1fr", gap: 10} },
                                 React.createElement("div", null,
-                                    React.createElement("div", { style: {color: "#475569", fontSize: 9, marginBottom: 4, textAlign: "center"} }, "التكرار"),
-                                    React.createElement("input", { type: "number", value: set.reps, onChange: e => update(activeEx, si, "reps", e.target.value), placeholder: "0", style: {width: "100%", background: "#1e293b", border: "1px solid #334155", borderRadius: 8, padding: "8px 10px", color: "#f8fafc", fontSize: 18, fontWeight: 700, textAlign: "center", outline: "none"} })
+                                    React.createElement("div", { style: {color: "#475569", fontSize: 9, marginBottom: 5, textAlign: "center", fontWeight: 500} }, "التكرار"),
+                                    React.createElement("input", { 
+                                        type: "number", value: set.reps,
+                                        onChange: e => update(activeEx, si, "reps", e.target.value),
+                                        placeholder: "0",
+                                        style: {
+                                            width: "100%", background: "rgba(15,23,42,0.6)",
+                                            border: "1px solid rgba(148,163,184,0.1)",
+                                            borderRadius: 10, padding: "10px 12px",
+                                            color: "#f8fafc", fontSize: 18, fontWeight: 700,
+                                            textAlign: "center", outline: "none",
+                                            transition: "border-color 0.2s"
+                                        } 
+                                    })
                                 ),
                                 React.createElement("div", null,
-                                    React.createElement("div", { style: {color: "#475569", fontSize: 9, marginBottom: 4, textAlign: "center"} }, "الوحدة"),
-                                    React.createElement("select", { value: set.unit, onChange: e => update(activeEx, si, "unit", e.target.value), style: {width: "100%", background: "#1e293b", border: "1px solid #334155", borderRadius: 8, padding: "8px 4px", color: "#94a3b8", fontSize: 12, fontWeight: 600, textAlign: "center", outline: "none"} },
+                                    React.createElement("div", { style: {color: "#475569", fontSize: 9, marginBottom: 5, textAlign: "center", fontWeight: 500} }, "الوحدة"),
+                                    React.createElement("select", { 
+                                        value: set.unit,
+                                        onChange: e => update(activeEx, si, "unit", e.target.value),
+                                        style: {
+                                            width: "100%", background: "rgba(15,23,42,0.6)",
+                                            border: "1px solid rgba(148,163,184,0.1)",
+                                            borderRadius: 10, padding: "10px 4px",
+                                            color: "#94a3b8", fontSize: 12, fontWeight: 600,
+                                            textAlign: "center", outline: "none"
+                                        } 
+                                    },
                                         React.createElement("option", null, "kg"), React.createElement("option", null, "lb")
                                     )
                                 ),
                                 React.createElement("div", null,
-                                    React.createElement("div", { style: {color: "#475569", fontSize: 9, marginBottom: 4, textAlign: "center"} }, "الوزن"),
-                                    React.createElement("input", { type: "number", value: set.weight, onChange: e => update(activeEx, si, "weight", e.target.value), placeholder: "0", style: {width: "100%", background: "#1e293b", border: "1px solid #334155", borderRadius: 8, padding: "8px 10px", color: "#f8fafc", fontSize: 18, fontWeight: 700, textAlign: "center", outline: "none"} })
+                                    React.createElement("div", { style: {color: "#475569", fontSize: 9, marginBottom: 5, textAlign: "center", fontWeight: 500} }, "الوزن"),
+                                    React.createElement("input", { 
+                                        type: "number", value: set.weight,
+                                        onChange: e => update(activeEx, si, "weight", e.target.value),
+                                        placeholder: "0",
+                                        style: {
+                                            width: "100%", background: "rgba(15,23,42,0.6)",
+                                            border: "1px solid rgba(148,163,184,0.1)",
+                                            borderRadius: 10, padding: "10px 12px",
+                                            color: "#f8fafc", fontSize: 18, fontWeight: 700,
+                                            textAlign: "center", outline: "none",
+                                            transition: "border-color 0.2s"
+                                        } 
+                                    })
                                 )
-                            ) : React.createElement("div", { style: {display: "flex", gap: 10, alignItems: "center"} },
-                                React.createElement("div", { style: {flex: 1, background: "#1e293b", borderRadius: 10, padding: "10px", textAlign: "center"} },
-                                    React.createElement("span", { style: {color: timer.active && timer.exIdx === activeEx && timer.setIdx === si ? c.accent : "#f8fafc", fontSize: 24, fontWeight: 800} },
+                            ) : React.createElement("div", { style: {display: "flex", gap: 12, alignItems: "center"} },
+                                React.createElement("div", { 
+                                    style: {
+                                        flex: 1, background: "rgba(15,23,42,0.6)",
+                                        borderRadius: 12, padding: "12px",
+                                        textAlign: "center", border: "1px solid rgba(148,163,184,0.08)"
+                                    } 
+                                },
+                                    React.createElement("span", { style: {color: timer.active && timer.exIdx === activeEx && timer.setIdx === si ? c.accent : "#f8fafc", fontSize: 26, fontWeight: 800} },
                                         timer.active && timer.exIdx === activeEx && timer.setIdx === si ? Math.floor(timer.seconds / 60) + ":" + String(timer.seconds % 60).padStart(2, "0") : (set.duration || "0:00")
                                     )
                                 ),
-                                React.createElement("button", { onClick: () => toggleTimer(activeEx, si), style: {background: timer.active && timer.exIdx === activeEx && timer.setIdx === si ? "#dc2626" : c.accent, border: "none", borderRadius: 10, padding: "12px 14px", color: "#fff", fontSize: 18} },
+                                React.createElement("button", { 
+                                    onClick: () => toggleTimer(activeEx, si),
+                                    className: "btn-primary",
+                                    style: {
+                                        background: timer.active && timer.exIdx === activeEx && timer.setIdx === si ? "#dc2626" : c.accent,
+                                        border: "none", borderRadius: 12,
+                                        padding: "14px 16px", color: "#fff", fontSize: 20,
+                                        boxShadow: timer.active && timer.exIdx === activeEx && timer.setIdx === si ? "0 4px 16px rgba(220,38,38,0.3)" : "0 4px 16px " + c.accent + "33"
+                                    } 
+                                },
                                     timer.active && timer.exIdx === activeEx && timer.setIdx === si ? "⏹" : "▶"
                                 )
                             )
                         ))
                     ),
-                    rest.active && React.createElement("div", { style: {background: rest.seconds <= 10 ? "#450a0a" : "#1e293b", borderRadius: 16, padding: "14px 20px", marginBottom: 12, border: "1px solid " + (rest.seconds <= 10 ? "#dc2626" : "#334155"), display: "flex", alignItems: "center", justifyContent: "space-between", flexDirection: "row-reverse"} },
+
+                    // Rest Timer
+                    rest.active && React.createElement("div", { 
+                        className: "fade-in-up",
+                        style: {
+                            background: rest.seconds <= 10 ? "rgba(220,38,38,0.1)" : "rgba(15,23,42,0.8)",
+                            borderRadius: 18, padding: "16px 22px",
+                            marginBottom: 14,
+                            border: "1px solid " + (rest.seconds <= 10 ? "rgba(239,68,68,0.3)" : "rgba(148,163,184,0.08)"),
+                            display: "flex", alignItems: "center",
+                            justifyContent: "space-between", flexDirection: "row-reverse",
+                            backdropFilter: "blur(10px)",
+                            boxShadow: rest.seconds <= 10 ? "0 0 30px rgba(239,68,68,0.15)" : "0 8px 32px rgba(0,0,0,0.2)"
+                        } 
+                    },
                         React.createElement("div", null,
-                            React.createElement("div", { style: {color: rest.seconds <= 10 ? "#ef4444" : "#64748b", fontSize: 11, fontWeight: 700} }, "⏳ وقت الراحة"),
-                            React.createElement("div", { style: {color: rest.seconds <= 10 ? "#ef4444" : "#f8fafc", fontSize: 32, fontWeight: 800} }, Math.floor(rest.seconds / 60) + ":" + String(rest.seconds % 60).padStart(2, "0"))
+                            React.createElement("div", { style: {color: rest.seconds <= 10 ? "#ef4444" : "#475569", fontSize: 11, fontWeight: 700, letterSpacing: 1} }, "⏳ وقت الراحة"),
+                            React.createElement("div", { style: {color: rest.seconds <= 10 ? "#ef4444" : "#f8fafc", fontSize: 36, fontWeight: 800, letterSpacing: -1} }, 
+                                Math.floor(rest.seconds / 60) + ":" + String(rest.seconds % 60).padStart(2, "0")
+                            )
                         ),
-                        React.createElement("button", { onClick: () => { audioManager.init(); setRest({active: false, seconds: restDuration}); }, style: {background: "#334155", border: "none", borderRadius: 10, padding: "8px 14px", color: "#94a3b8", cursor: "pointer", fontSize: 12} }, "تخطي")
+                        React.createElement("button", { 
+                            onClick: () => { audioManager.init(); setRest({active: false, seconds: restDuration}); if (bgTimerRef.current) bgTimerRef.current.stop(); },
+                            className: "btn-primary",
+                            style: {background: "rgba(51,65,85,0.5)", border: "1px solid rgba(148,163,184,0.1)", borderRadius: 10, padding: "8px 16px", color: "#94a3b8", cursor: "pointer", fontSize: 12} 
+                        }, "تخطي")
                     ),
-                    rpeModal.show && React.createElement("div", { className: "fade-in", style: {position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.8)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 20} },
-                        React.createElement("div", { style: {background: "#1e293b", borderRadius: 20, padding: 24, width: "100%", maxWidth: 320, border: "1px solid #334155"} },
-                            React.createElement("h3", { style: {color: "#f8fafc", fontSize: 16, fontWeight: 700, textAlign: "center", marginBottom: 4} }, "📊 تقييم الشدة (RPE)"),
-                            React.createElement("p", { style: {color: "#64748b", fontSize: 11, textAlign: "center", marginBottom: 16} }, "قد إيه التمرين كان صعب؟"),
-                            React.createElement("div", { style: {display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: 6, marginBottom: 16} },
-                                [1,2,3,4,5,6,7,8,9,10].map(rpe => React.createElement("button", { key: rpe, onClick: () => saveRPE(rpe), style: {background: rpe <= 4 ? "#14532d" : rpe <= 7 ? "#1e3a5f" : rpe <= 9 ? "#7c2d12" : "#450a0a", border: "none", borderRadius: 10, padding: "10px 0", color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer"} }, rpe))
+
+                    // RPE Modal
+                    rpeModal.show && React.createElement("div", { 
+                        className: "modal-overlay fade-in",
+                        style: {
+                            position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            zIndex: 100, padding: 20
+                        } 
+                    },
+                        React.createElement("div", { 
+                            className: "scale-in",
+                            style: {
+                                background: "linear-gradient(180deg, #0f172a, #070a13)",
+                                borderRadius: 24, padding: 28,
+                                width: "100%", maxWidth: 340,
+                                border: "1px solid rgba(148,163,184,0.1)",
+                                boxShadow: "0 24px 80px rgba(0,0,0,0.6)"
+                            } 
+                        },
+                            React.createElement("h3", { style: {color: "#f8fafc", fontSize: 17, fontWeight: 700, textAlign: "center", marginBottom: 4} }, "📊 تقييم الشدة (RPE)"),
+                            React.createElement("p", { style: {color: "#64748b", fontSize: 11, textAlign: "center", marginBottom: 20} }, "قد إيه التمرين كان صعب؟"),
+                            React.createElement("div", { style: {display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: 8, marginBottom: 18} },
+                                [1,2,3,4,5,6,7,8,9,10].map(rpe => React.createElement("button", { 
+                                    key: rpe, 
+                                    onClick: () => saveRPE(rpe),
+                                    className: "btn-primary",
+                                    style: {
+                                        background: rpe <= 4 ? "rgba(34,197,94,0.15)" : rpe <= 7 ? "rgba(59,130,246,0.15)" : rpe <= 9 ? "rgba(249,115,22,0.15)" : "rgba(239,68,68,0.15)",
+                                        border: "1px solid " + (rpe <= 4 ? "rgba(34,197,94,0.2)" : rpe <= 7 ? "rgba(59,130,246,0.2)" : rpe <= 9 ? "rgba(249,115,22,0.2)" : "rgba(239,68,68,0.2)"),
+                                        borderRadius: 12, padding: "12px 0",
+                                        color: rpe <= 4 ? "#22c55e" : rpe <= 7 ? "#3b82f6" : rpe <= 9 ? "#f97316" : "#ef4444",
+                                        fontSize: 15, fontWeight: 700, cursor: "pointer"
+                                    } 
+                                }, rpe))
                             ),
-                            React.createElement("div", { style: {display: "flex", justifyContent: "space-between", fontSize: 10, color: "#64748b"} },
+                            React.createElement("div", { style: {display: "flex", justifyContent: "space-between", fontSize: 10, color: "#475569", padding: "0 4px"} },
                                 React.createElement("span", null, "سهل جداً"), React.createElement("span", null, "أقصى جهد")
                             ),
-                            React.createElement("button", { onClick: () => setRpeModal({show: false, exIdx: null, setIdx: null}), style: {width: "100%", marginTop: 12, background: "transparent", border: "1px solid #334155", borderRadius: 10, padding: 10, color: "#64748b", cursor: "pointer", fontSize: 12} }, "تخطي التقييم")
+                            React.createElement("button", { 
+                                onClick: () => setRpeModal({show: false, exIdx: null, setIdx: null}),
+                                className: "btn-primary",
+                                style: {width: "100%", marginTop: 16, background: "transparent", border: "1px solid rgba(148,163,184,0.1)", borderRadius: 12, padding: 12, color: "#64748b", cursor: "pointer", fontSize: 12} 
+                            }, "تخطي التقييم")
                         )
                     ),
+
+                    // Substitution Modal
+                    subModal.show && React.createElement(SubstitutionModal, {
+                        exerciseName: data[subModal.exIdx]?.name,
+                        onSelect: (newName) => handleSubstitute(subModal.exIdx, newName),
+                        onClose: () => setSubModal({show: false, exIdx: null}),
+                        accent: c.accent
+                    }),
+
+                    // Navigation buttons
                     React.createElement("div", { style: {display: "flex", gap: 10} },
                         activeEx < data.length - 1 ?
-                            React.createElement("button", { onClick: () => { initAudio(); setActiveEx(activeEx + 1); setShowTips(false); setShowGif(true); }, style: {flex: 1, background: c.accent, border: "none", borderRadius: 12, padding: 12, color: "#fff", fontWeight: 700, cursor: "pointer"} }, "التالي ←") :
-                            React.createElement("button", { onClick: () => { initAudio(); handleFinish(); }, style: {flex: 1, background: "linear-gradient(135deg," + c.accent + ",#22c55e)", border: "none", borderRadius: 12, padding: 12, color: "#fff", fontWeight: 700, cursor: "pointer"} }, "🏁 إنهاء وتوليد التقرير"),
-                        activeEx > 0 && React.createElement("button", { onClick: () => { initAudio(); setActiveEx(activeEx - 1); setShowTips(false); setShowGif(true); }, style: {flex: 1, background: "#1e293b", border: "1px solid #334155", borderRadius: 12, padding: 12, color: "#94a3b8", cursor: "pointer"} }, "← السابق")
+                            React.createElement("button", { 
+                                onClick: () => { initAudio(); setActiveEx(activeEx + 1); setShowTips(false); setShowGif(true); },
+                                className: "btn-primary",
+                                style: {
+                                    flex: 1, background: "linear-gradient(135deg, " + c.accent + ", " + c.accent + "dd)",
+                                    border: "none", borderRadius: 14, padding: 14,
+                                    color: "#fff", fontWeight: 700, cursor: "pointer",
+                                    fontSize: 15,
+                                    boxShadow: "0 8px 24px " + c.accent + "33"
+                                } 
+                            }, "التالي ←") :
+                            React.createElement("button", { 
+                                onClick: () => { initAudio(); handleFinish(); },
+                                className: "btn-primary",
+                                style: {
+                                    flex: 1, background: "linear-gradient(135deg, " + c.accent + ", #22c55e)",
+                                    border: "none", borderRadius: 14, padding: 14,
+                                    color: "#fff", fontWeight: 700, cursor: "pointer",
+                                    fontSize: 15,
+                                    boxShadow: "0 8px 24px rgba(34,197,94,0.3)"
+                                } 
+                            }, "🏁 إنهاء وتوليد التقرير"),
+                        activeEx > 0 && React.createElement("button", { 
+                            onClick: () => { initAudio(); setActiveEx(activeEx - 1); setShowTips(false); setShowGif(true); },
+                            className: "btn-primary",
+                            style: {
+                                flex: 1, background: "rgba(15,23,42,0.6)",
+                                border: "1px solid rgba(148,163,184,0.1)",
+                                borderRadius: 14, padding: 14,
+                                color: "#94a3b8", cursor: "pointer", fontSize: 15
+                            } 
+                        }, "← السابق")
                     )
                 )
             );
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // REPORT SCREEN v6.0
+        // ═══════════════════════════════════════════════════════════════
         function ReportScreen({session, history, onHome}) {
             const c = C[session.workout];
             const [copied, setCopied] = useState(false);
@@ -906,33 +1782,44 @@
                 });
             };
 
-            return React.createElement("div", { className: "min-h-screen text-right pb-10 safe-top safe-bottom", style: {background: "#0a0f1a"} },
-                React.createElement("div", { style: {background: "linear-gradient(135deg," + c.bg + ",#0a0f1a)", padding: "28px 20px 20px", textAlign: "center", borderBottom: "1px solid " + c.accent + "22"} },
-                    React.createElement("div", { style: {fontSize: 44, marginBottom: 8} }, "🏆"),
-                    React.createElement("h1", { style: {color: "#f8fafc", fontSize: 20, fontWeight: 800, margin: "0 0 4px"} }, "عاش يا أحمد! تم إنهاء التمرين"),
-                    React.createElement("p", { style: {color: c.accent, fontSize: 13, fontWeight: 600} }, session.workout + " — " + session.date)
+            return React.createElement("div", { className: "min-h-screen text-right pb-10 safe-top safe-bottom", style: {background: "#070a13"} },
+                React.createElement("div", { 
+                    style: {
+                        background: c.gradient,
+                        padding: "32px 24px 24px", textAlign: "center",
+                        borderBottom: "1px solid " + c.accent + "15"
+                    } 
+                },
+                    React.createElement("div", { style: {fontSize: 52, marginBottom: 12, filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.3))"} }, "🏆"),
+                    React.createElement("h1", { style: {color: "#f8fafc", fontSize: 22, fontWeight: 800, margin: "0 0 6px"} }, "عاش يا أحمد! تم إنهاء التمرين"),
+                    React.createElement("p", { style: {color: c.accent + "cc", fontSize: 14, fontWeight: 500} }, session.workout + " — " + session.date)
                 ),
-                React.createElement("div", { style: {padding: 16} },
-                    React.createElement("div", { style: {display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 10, marginBottom: 16} },
-                        React.createElement("div", { style: {background: "#1e293b", borderRadius: 12, padding: "12px 8px", textAlign: "center", border: "1px solid #334155"} },
-                            React.createElement("div", { style: {color: "#475569", fontSize: 10, marginBottom: 4} }, "المقارنة"),
-                            React.createElement("div", { style: {color: volDiff > 0 ? "#22c55e" : volDiff < 0 ? "#ef4444" : "#64748b", fontWeight: 800, fontSize: 13} }, volDiff !== null ? (volDiff >= 0 ? "+" : "") + Math.round(volDiff).toLocaleString() : "أول جلسة")
-                        ),
-                        React.createElement("div", { style: {background: "#1e293b", borderRadius: 12, padding: "12px 8px", textAlign: "center", border: "1px solid #334155"} },
-                            React.createElement("div", { style: {color: "#475569", fontSize: 10, marginBottom: 4} }, "الحجم"),
-                            React.createElement("div", { style: {color: c.accent, fontWeight: 800, fontSize: 13} }, formatVolume(vol))
-                        ),
-                        React.createElement("div", { style: {background: "#1e293b", borderRadius: 12, padding: "12px 8px", textAlign: "center", border: "1px solid #334155"} },
-                            React.createElement("div", { style: {color: "#475569", fontSize: 10, marginBottom: 4} }, "المجموعات"),
-                            React.createElement("div", { style: {color: doneSets === totalSets ? "#22c55e" : c.accent, fontWeight: 800, fontSize: 13} }, doneSets + "/" + totalSets)
-                        ),
-                        React.createElement("div", { style: {background: "#1e293b", borderRadius: 12, padding: "12px 8px", textAlign: "center", border: "1px solid #334155"} },
-                            React.createElement("div", { style: {color: "#475569", fontSize: 10, marginBottom: 4} }, "متوسط RPE"),
-                            React.createElement("div", { style: {color: avgRPE > 8 ? "#ef4444" : avgRPE > 6 ? "#f97316" : "#22c55e", fontWeight: 800, fontSize: 13} }, avgRPE > 0 ? avgRPE.toFixed(1) : "—")
+                React.createElement("div", { style: {padding: 20} },
+                    // Stats grid
+                    React.createElement("div", { style: {display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 10, marginBottom: 18} },
+                        [
+                            {label: "المقارنة", value: volDiff !== null ? (volDiff >= 0 ? "+" : "") + Math.round(volDiff).toLocaleString() : "أول جلسة", color: volDiff > 0 ? "#22c55e" : volDiff < 0 ? "#ef4444" : "#64748b"},
+                            {label: "الحجم", value: formatVolume(vol), color: c.accent},
+                            {label: "المجموعات", value: doneSets + "/" + totalSets, color: doneSets === totalSets ? "#22c55e" : c.accent},
+                            {label: "متوسط RPE", value: avgRPE > 0 ? avgRPE.toFixed(1) : "—", color: avgRPE > 8 ? "#ef4444" : avgRPE > 6 ? "#f97316" : "#22c55e"}
+                        ].map((stat, i) =>
+                            React.createElement("div", { 
+                                key: i,
+                                className: "glass-card-strong fade-in-up stagger-" + (i + 1),
+                                style: {borderRadius: 14, padding: "14px 8px", textAlign: "center"} 
+                            },
+                                React.createElement("div", { style: {color: "#475569", fontSize: 9, marginBottom: 5, fontWeight: 500, letterSpacing: 0.5} }, stat.label),
+                                React.createElement("div", { style: {color: stat.color, fontWeight: 800, fontSize: 14} }, stat.value)
+                            )
                         )
                     ),
-                    React.createElement("div", { style: {background: "#1e293b", borderRadius: 16, padding: 14, marginBottom: 14, border: "1px solid #334155"} },
-                        React.createElement("div", { style: {color: "#475569", fontSize: 11, fontWeight: 700, marginBottom: 10} }, "ملخص الأداء الحالي"),
+
+                    // Performance summary
+                    React.createElement("div", { 
+                        className: "glass-card-strong fade-in-up stagger-3",
+                        style: {borderRadius: 18, padding: 16, marginBottom: 16} 
+                    },
+                        React.createElement("div", { style: {color: "#475569", fontSize: 11, fontWeight: 700, marginBottom: 12, letterSpacing: 1} }, "ملخص الأداء الحالي"),
                         session.exercises.map((ex, i) => {
                             const pe = prev ? prev.exercises.find(e => e.name === ex.name) : null;
                             const cb = ex.type === "reps" ? ex.sets.reduce((b, s) => Math.max(b, parseFloat(s.weight) || 0), 0) : null;
@@ -941,36 +1828,76 @@
                             const unit = ex.sets[0] ? ex.sets[0].unit : "kg";
                             const setRPEs = ex.sets.filter(s => s.rpe).map(s => s.rpe);
                             const avgExRPE = setRPEs.length ? (setRPEs.reduce((a, b) => a + b, 0) / setRPEs.length).toFixed(1) : null;
-                            return React.createElement("div", { key: i, style: {display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderBottom: i < session.exercises.length - 1 ? "1px solid #0f172a" : "none", flexDirection: "row-reverse"} },
-                                React.createElement("span", { style: {color: "#94a3b8", fontSize: 12} }, ex.name),
-                                React.createElement("div", { style: {display: "flex", gap: 6, alignItems: "center", flexDirection: "row-reverse"} },
+                            return React.createElement("div", { 
+                                key: i, 
+                                style: {
+                                    display: "flex", justifyContent: "space-between",
+                                    alignItems: "center", padding: "8px 0",
+                                    borderBottom: i < session.exercises.length - 1 ? "1px solid rgba(148,163,184,0.04)" : "none",
+                                    flexDirection: "row-reverse"
+                                } 
+                            },
+                                React.createElement("span", { style: {color: "#94a3b8", fontSize: 12, fontWeight: 500} }, ex.name),
+                                React.createElement("div", { style: {display: "flex", gap: 8, alignItems: "center", flexDirection: "row-reverse"} },
                                     ex.type === "reps" ? [
-                                        React.createElement("span", { key: "r", style: {color: "#475569", fontSize: 11} }, ex.sets.map(s => s.reps || "?").join("/") + " تكرار"),
+                                        React.createElement("span", { key: "r", style: {color: "#475569", fontSize: 10} }, ex.sets.map(s => s.reps || "?").join("/") + " تكرار"),
                                         React.createElement("span", { key: "w", style: {color: c.accent, fontWeight: 700, fontSize: 12} }, cb > 0 ? cb + unit : "—"),
                                         diff !== null && React.createElement("span", { key: "d", style: {color: diff > 0 ? "#22c55e" : diff < 0 ? "#ef4444" : "#64748b", fontSize: 11, fontWeight: 700} }, diff > 0 ? "↑" + diff : diff < 0 ? "↓" + Math.abs(diff) : "="),
-                                        avgExRPE && React.createElement("span", { key: "rp", style: {color: "#a855f7", fontSize: 10} }, "RPE" + avgExRPE)
+                                        avgExRPE && React.createElement("span", { key: "rp", style: {color: "#a855f7", fontSize: 10, fontWeight: 600} }, "RPE" + avgExRPE)
                                     ] : React.createElement("span", { style: {color: c.accent, fontSize: 11} }, "⏱ " + ex.sets.map(s => s.duration || "?").join(" / "))
                                 )
                             );
                         })
                     ),
-                    React.createElement("div", { style: {background: "linear-gradient(135deg,#1e293b,#0f1f35)", borderRadius: 18, padding: 16, marginBottom: 12, border: "1px solid " + c.accent + "33"} },
-                        React.createElement("div", { style: {display: "flex", gap: 10, alignItems: "center", marginBottom: 10, flexDirection: "row-reverse"} },
-                            React.createElement("span", { style: {fontSize: 22} }, "🤖"),
+
+                    // Gemini link
+                    React.createElement("div", { 
+                        className: "glass-card-strong fade-in-up stagger-4",
+                        style: {
+                            borderRadius: 20, padding: 18, marginBottom: 14,
+                            border: "1px solid " + c.accent + "15"
+                        } 
+                    },
+                        React.createElement("div", { style: {display: "flex", gap: 12, alignItems: "center", marginBottom: 12, flexDirection: "row-reverse"} },
+                            React.createElement("span", { style: {fontSize: 28} }, "🤖"),
                             React.createElement("div", null,
-                                React.createElement("div", { style: {color: "#f8fafc", fontWeight: 700, fontSize: 14} }, "ارتباط ذكي بـ Gemini"),
-                                React.createElement("div", { style: {color: "#475569", fontSize: 11} }, "تم ترك خانات الساعة بالكامل فارغة لتقوم بإرفاق الإسكرين شوت يدوياً مع الـ Prompt التلقائي منسوخاً.")
+                                React.createElement("div", { style: {color: "#f8fafc", fontWeight: 700, fontSize: 15} }, "ارتباط ذكي بـ Gemini"),
+                                React.createElement("div", { style: {color: "#475569", fontSize: 11, marginTop: 2} }, "تم ترك خانات الساعة بالكامل فارغة لتقوم بإرفاق الإسكرين شوت يدوياً مع الـ Prompt التلقائي منسوخاً.")
                             )
                         ),
-                        React.createElement("button", { onClick: copyAndGo, style: {width: "100%", background: copied ? "#22c55e" : "linear-gradient(135deg,#3b82f6," + c.accent + ")", border: "none", borderRadius: 12, padding: "14px", color: "#fff", cursor: "pointer", fontSize: 15, fontWeight: 700} },
+                        React.createElement("button", { 
+                            onClick: copyAndGo,
+                            className: "btn-primary",
+                            style: {
+                                width: "100%",
+                                background: copied ? "#22c55e" : "linear-gradient(135deg, #3b82f6, " + c.accent + ")",
+                                border: "none", borderRadius: 14, padding: "16px",
+                                color: "#fff", cursor: "pointer", fontSize: 15, fontWeight: 700,
+                                boxShadow: copied ? "0 8px 24px rgba(34,197,94,0.3)" : "0 8px 24px rgba(59,130,246,0.25)"
+                            } 
+                        },
                             copied ? "🚀 تم النسخ وجاري فتح Gemini..." : "📋 نسخ الـ Prompt والذهاب لـ Gemini"
                         )
                     ),
-                    React.createElement("button", { onClick: onHome, style: {width: "100%", background: "transparent", border: "1px solid #1e293b", borderRadius: 12, padding: 12, color: "#47548b", cursor: "pointer"} }, "🏠 العودة للشاشة الرئيسية")
+
+                    React.createElement("button", { 
+                        onClick: onHome,
+                        className: "btn-primary fade-in-up stagger-5",
+                        style: {
+                            width: "100%", background: "rgba(15,23,42,0.4)",
+                            border: "1px solid rgba(148,163,184,0.08)",
+                            borderRadius: 14, padding: 14,
+                            color: "#475569", cursor: "pointer",
+                            fontSize: 14, fontWeight: 600
+                        } 
+                    }, "🏠 العودة للشاشة الرئيسية")
                 )
             );
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // HISTORY SCREEN v6.0
+        // ═══════════════════════════════════════════════════════════════
         function HistoryScreen({onBack}) {
             const [history] = useState(getStorage);
             const [tab, setTab] = useState("log");
@@ -984,40 +1911,79 @@
             };
             const stats = exStats();
             const keys = Object.keys(stats);
-            return React.createElement("div", { className: "min-h-screen text-right pb-40 safe-top safe-bottom", style: {background: "#0a0f1a"} },
-                React.createElement("div", { style: {background: "#1e293b", padding: "16px 16px 0", borderBottom: "1px solid #334155"} },
-                    React.createElement("div", { style: {display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14} },
+
+            return React.createElement("div", { className: "min-h-screen text-right pb-40 safe-top safe-bottom", style: {background: "#070a13"} },
+                React.createElement("div", { 
+                    style: {
+                        background: "linear-gradient(180deg, #0f172a, #070a13)",
+                        padding: "16px 16px 0", borderBottom: "1px solid rgba(148,163,184,0.06)"
+                    } 
+                },
+                    React.createElement("div", { style: {display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16} },
                         React.createElement("div", { style: {color: "#f8fafc", fontWeight: 800, fontSize: 18} }, "📊 السجل والتحليل التراكمي"),
-                        React.createElement("button", { onClick: onBack, style: {background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 8, padding: "7px 11px", color: "#e2e8f0", cursor: "pointer", fontSize: 15} }, "→")
+                        React.createElement("button", { 
+                            onClick: onBack,
+                            className: "glass-card btn-primary",
+                            style: {border: "none", borderRadius: 10, padding: "8px 14px", color: "#e2e8f0", cursor: "pointer", fontSize: 15} 
+                        }, "→")
                     ),
-                    React.createElement("div", { style: {display: "flex", background: "#0a0f1a", borderRadius: 10, padding: 3, marginBottom: 14, flexDirection: "row-reverse"} },
+                    React.createElement("div", { 
+                        style: {
+                            display: "flex", background: "rgba(15,23,42,0.5)",
+                            borderRadius: 12, padding: 4, marginBottom: 16,
+                            flexDirection: "row-reverse",
+                            border: "1px solid rgba(148,163,184,0.06)"
+                        } 
+                    },
                         [["log","📋 السجل"],["analysis","📈 تحليل"]].map(([t,l]) =>
-                            React.createElement("button", { key: t, onClick: () => setTab(t), style: {flex: 1, background: tab === t ? "#3b82f6" : "transparent", border: "none", borderRadius: 8, padding: "7px 0", color: tab === t ? "#fff" : "#64748b", fontSize: 12, fontWeight: 600} }, l)
+                            React.createElement("button", { 
+                                key: t, 
+                                onClick: () => setTab(t),
+                                className: "btn-primary",
+                                style: {
+                                    flex: 1,
+                                    background: tab === t ? "linear-gradient(135deg, #3b82f6, #2563eb)" : "transparent",
+                                    border: "none", borderRadius: 10,
+                                    padding: "8px 0",
+                                    color: tab === t ? "#fff" : "#64748b",
+                                    fontSize: 12, fontWeight: 600,
+                                    transition: "all 0.3s"
+                                } 
+                            }, l)
                         )
                     )
                 ),
                 React.createElement("div", { style: {padding: 16} },
                     tab === "log" && (history.length === 0
-                        ? React.createElement("div", { style: {textAlign: "center", padding: 60, color: "#475569"} }, React.createElement("div", { style: {fontSize: 48} }, "🏋️"), React.createElement("p", null, "لا يوجد تدريبات مسجلة بعد"))
+                        ? React.createElement("div", { style: {textAlign: "center", padding: 60, color: "#475569"} }, 
+                            React.createElement("div", { style: {fontSize: 48, marginBottom: 16} }, "🏋️"), 
+                            React.createElement("p", {style: {fontSize: 14}}, "لا يوجد تدريبات مسجلة بعد")
+                        )
                         : [...history].reverse().map((s, i) => {
                             const c = C[s.workout] || {accent: "#3b82f6", emoji: "💪"};
                             const vol = calcVolume(s.exercises);
-                            return React.createElement("div", { key: i, style: {background: "#1e293b", borderRadius: 14, padding: 14, marginBottom: 10, border: "1px solid #334155"} },
+                            return React.createElement("div", { 
+                                key: i,
+                                className: "glass-card-strong fade-in-up",
+                                style: {borderRadius: 16, padding: 16, marginBottom: 10} 
+                            },
                                 React.createElement("div", { style: {display: "flex", justifyContent: "space-between", flexDirection: "row-reverse"} },
                                     React.createElement("div", null,
                                         React.createElement("div", { style: {color: "#f8fafc", fontWeight: 700, fontSize: 14} }, c.emoji + " " + s.workout),
-                                        React.createElement("div", { style: {color: "#64748b", fontSize: 12, marginTop: 2} }, s.date + " • " + (s.durationMins || "—") + " دقيقة")
+                                        React.createElement("div", { style: {color: "#475569", fontSize: 12, marginTop: 4} }, s.date + " • " + (s.durationMins || "—") + " دقيقة")
                                     ),
                                     React.createElement("div", { style: {textAlign: "left"} },
                                         vol > 0 && React.createElement("div", { style: {color: c.accent, fontWeight: 700, fontSize: 14} }, formatVolume(vol)),
-                                        React.createElement("div", { style: {color: "#64748b", fontSize: 11} }, s.exercises.reduce((a, ex) => a + ex.sets.filter(x => x.done).length, 0) + "/" + s.exercises.reduce((a, ex) => a + ex.sets.length, 0) + " جولة")
+                                        React.createElement("div", { style: {color: "#475569", fontSize: 10, marginTop: 2} }, s.exercises.reduce((a, ex) => a + ex.sets.filter(x => x.done).length, 0) + "/" + s.exercises.reduce((a, ex) => a + ex.sets.length, 0) + " جولة")
                                     )
                                 )
                             );
                         })
                     ),
                     tab === "analysis" && (keys.length === 0
-                        ? React.createElement("div", { style: {textAlign: "center", padding: 60, color: "#475569"} }, React.createElement("p", null, "سجل بعض التدريبات أولاً لرؤية التحليل المتقدم"))
+                        ? React.createElement("div", { style: {textAlign: "center", padding: 60, color: "#475569"} }, 
+                            React.createElement("p", {style: {fontSize: 14}}, "سجل بعض التدريبات أولاً لرؤية التحليل المتقدم")
+                        )
                         : keys.map(name => {
                             const e = stats[name];
                             if (!e.length) return null;
@@ -1025,13 +1991,29 @@
                             const aR = Math.round(e.reduce((a, x) => a + x.reps, 0) / e.length);
                             const trend = e.length > 1 ? (e[e.length - 1].weight > e[0].weight ? "📈 تحسن" : e[e.length - 1].weight < e[0].weight ? "📉 تراجع" : "➡️ ثابت") : "—";
                             const avgRPE = e.filter(x => x.rpe).length ? (e.filter(x => x.rpe).reduce((a, x) => a + x.rpe, 0) / e.filter(x => x.rpe).length).toFixed(1) : "—";
-                            return React.createElement("div", { key: name, style: {background: "#1e293b", borderRadius: 14, padding: 14, marginBottom: 10, border: "1px solid #334155"} },
-                                React.createElement("div", { style: {color: "#f8fafc", fontWeight: 700, fontSize: 13, marginBottom: 10} }, name),
+                            return React.createElement("div", { 
+                                key: name,
+                                className: "glass-card-strong fade-in-up",
+                                style: {borderRadius: 16, padding: 16, marginBottom: 10} 
+                            },
+                                React.createElement("div", { style: {color: "#f8fafc", fontWeight: 700, fontSize: 13, marginBottom: 12} }, name),
                                 React.createElement("div", { style: {display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8} },
-                                    [["اتجاه",trend],["متوسط التكرار",aR],["أعلى وزن",mW+e[0].unit],["متوسط RPE",avgRPE]].map(([l,v]) =>
-                                        React.createElement("div", { key: l, style: {background: "#0a0f1a", borderRadius: 8, padding: "8px 4px", textAlign: "center"} },
-                                            React.createElement("div", { style: {color: "#475569", fontSize: 9, marginBottom: 3} }, l),
-                                            React.createElement("div", { style: {color: "#f8fafc", fontWeight: 700, fontSize: 11} }, v)
+                                    [
+                                        {label: "اتجاه", value: trend},
+                                        {label: "متوسط التكرار", value: aR},
+                                        {label: "أعلى وزن", value: mW + e[0].unit},
+                                        {label: "متوسط RPE", value: avgRPE}
+                                    ].map((stat, i) =>
+                                        React.createElement("div", { 
+                                            key: i,
+                                            style: {
+                                                background: "rgba(7,10,19,0.5)",
+                                                borderRadius: 10, padding: "10px 4px", textAlign: "center",
+                                                border: "1px solid rgba(148,163,184,0.04)"
+                                            } 
+                                        },
+                                            React.createElement("div", { style: {color: "#475569", fontSize: 8, marginBottom: 4, fontWeight: 500} }, stat.label),
+                                            React.createElement("div", { style: {color: "#f1f5f9", fontWeight: 700, fontSize: 11} }, stat.value)
                                         )
                                     )
                                 )
@@ -1042,17 +2024,30 @@
             );
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // APP ROOT
+        // ═══════════════════════════════════════════════════════════════
         function App() {
             const [screen, setScreen] = useState("select");
             const [activeWorkout, setActiveWorkout] = useState(null);
             const [reportData, setReportData] = useState(null);
-            if (screen === "workout") return React.createElement(WorkoutScreen, { workoutName: activeWorkout, onBack: () => setScreen("select"), onFinish: (s, h) => { setReportData({session: s, history: h}); setScreen("report"); } });
-            if (screen === "report") return React.createElement(ReportScreen, { session: reportData.session, history: reportData.history, onHome: () => setScreen("select") });
+
+            if (screen === "workout") return React.createElement(WorkoutScreen, { 
+                workoutName: activeWorkout, 
+                onBack: () => setScreen("select"), 
+                onFinish: (s, h) => { setReportData({session: s, history: h}); setScreen("report"); } 
+            });
+            if (screen === "report") return React.createElement(ReportScreen, { 
+                session: reportData.session, 
+                history: reportData.history, 
+                onHome: () => setScreen("select") 
+            });
             if (screen === "history") return React.createElement(HistoryScreen, { onBack: () => setScreen("select") });
             if (screen === "__profile__") return React.createElement(ProfileScreen, { onBack: () => setScreen("select") });
             if (screen === "__sync__") return React.createElement(GeminiSyncScreen, { onBack: () => setScreen("select") });
             if (screen === "__export__") return React.createElement(ExportScreen, { onBack: () => setScreen("select") });
             if (screen === "__ai__") return React.createElement(AICoachScreen, { onBack: () => setScreen("select") });
+
             return React.createElement(SelectScreen, { onSelect: name => {
                 if (name === "__history__") return setScreen("history");
                 if (name === "__profile__") return setScreen("__profile__");
