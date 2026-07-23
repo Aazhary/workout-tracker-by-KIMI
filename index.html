@@ -43,21 +43,21 @@
             "Assisted Chin-Up": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/4b2f8c91d1ae0f5e8ef5d6e309693e68c3000610.gif",
             "Chest Fly": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/59dc73937662ab45d931cae8b766a5b9e3bbcbc4.gif",
             "Leg Press": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/c8c424bed80d9c428e70287aeb3059e1da8a485a.gif",
-            "Hack Squat": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/0c1a4192b8140fe5f80ef563c4af1fbcab216ed9.gif",
+            "Hack Squat": null, // No duplicate - will show placeholder
             "Shoulder Press": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/9ebc107555e861ad60c675cd8dc372c1e60b2f58.gif",
             "Seated Side Raises": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/0959321662715b42ebe3a6784a2cffb5c5c180c6.gif",
             "Seated Leg Curl": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/a1a6885400ccd48312e4d3bc7a12a8b2438e9c4c.gif",
             "Triceps Press": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/6002b8f2311e58d8b2aaa83e4c391a36fc5c867e.gif",
             "Incline Biceps Curl": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/2743043ed295dd88f1c296f7c6f5b677d1d060b9.gif",
             "Abs Crunch": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/91ec56102f5222f83d938161d14c7efaaea79d15.gif",
-            "Plank": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/a41d1be7eac18730836eeca9fabdfdf958c0d46a.gif",
+            "Plank": null, // No duplicate - will show placeholder
             "T-Bar Row": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/88dee93a1e996e287548f140945c4dfb230db6c9.gif",
             "Chest Supported Row": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/ae74f98d00006026401f167e32802721f2a37420.gif",
             "Cable Rear Delt Fly": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/e47639981d6dc1b2c4a3be60312fce2a578d6728.gif",
-            "Triceps Pushdown": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/6002b8f2311e58d8b2aaa83e4c391a36fc5c867e.gif",
+            "Triceps Pushdown": null, // No duplicate - will show placeholder
             "Alternating Curl (Preacher)": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/28624734c8e17f81706dc4bd9520b50f1e90ff12.gif",
-            "Side Plank": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/a41d1be7eac18730836eeca9fabdfdf958c0d46a.gif",
-            "Leg Curl": "https://kimi-web-img.moonshot.cn/img/gymvisual.com/a1a6885400ccd48312e4d3bc7a12a8b2438e9c4c.gif",
+            "Side Plank": null, // No duplicate - will show placeholder
+            "Leg Curl": null, // No duplicate - will show placeholder
         };
 
         const DEFAULT_PROFILE = { name: "احمد", weight: 86.5, muscle: 61.6, fat: 21.4, visceralFat: 12, age: 38, dose: "Mounjaro 5mg", restSeconds: 90, rpeEnabled: true };
@@ -135,55 +135,201 @@
             ),
         }));
 
+        // ====== BACKGROUND TIMER (survives lock screen) ======
+        class BackgroundTimer {
+            constructor() {
+                this.startTime = null;
+                this.duration = 0;
+                this.remaining = 0;
+                this.active = false;
+                this.intervalId = null;
+                this.onTick = null;
+                this.onDone = null;
+            }
+
+            start(seconds, onTick, onDone) {
+                this.duration = seconds;
+                this.remaining = seconds;
+                this.active = true;
+                this.onTick = onTick;
+                this.onDone = onDone;
+                this.startTime = Date.now();
+
+                // Save to localStorage for persistence across background
+                localStorage.setItem('wt_timer_active', 'true');
+                localStorage.setItem('wt_timer_end', String(Date.now() + seconds * 1000));
+                localStorage.setItem('wt_timer_duration', String(seconds));
+
+                this._tick();
+                this.intervalId = setInterval(() => this._tick(), 1000);
+
+                // Listen for visibility changes
+                this._visibilityHandler = () => {
+                    if (!document.hidden) {
+                        this._syncFromStorage();
+                    }
+                };
+                document.addEventListener('visibilitychange', this._visibilityHandler);
+            }
+
+            _tick() {
+                if (!this.active) return;
+
+                const now = Date.now();
+                const elapsed = Math.floor((now - this.startTime) / 1000);
+                this.remaining = Math.max(0, this.duration - elapsed);
+
+                if (this.onTick) this.onTick(this.remaining);
+
+                if (this.remaining <= 0) {
+                    this.stop();
+                    if (this.onDone) this.onDone();
+                }
+            }
+
+            _syncFromStorage() {
+                const endTime = parseInt(localStorage.getItem('wt_timer_end') || '0');
+                if (endTime && this.active) {
+                    const now = Date.now();
+                    this.remaining = Math.max(0, Math.ceil((endTime - now) / 1000));
+                    if (this.onTick) this.onTick(this.remaining);
+
+                    if (this.remaining <= 0) {
+                        this.stop();
+                        if (this.onDone) this.onDone();
+                    }
+                }
+            }
+
+            stop() {
+                this.active = false;
+                if (this.intervalId) {
+                    clearInterval(this.intervalId);
+                    this.intervalId = null;
+                }
+                if (this._visibilityHandler) {
+                    document.removeEventListener('visibilitychange', this._visibilityHandler);
+                }
+                localStorage.removeItem('wt_timer_active');
+                localStorage.removeItem('wt_timer_end');
+                localStorage.removeItem('wt_timer_duration');
+            }
+
+            getRemaining() {
+                return this.remaining;
+            }
+        }
+
         class AudioManager {
-            constructor() { this.ctx = null; this.initialized = false; }
+            constructor() { 
+                this.ctx = null; 
+                this.initialized = false;
+                this._bindEvents();
+            }
+
+            _bindEvents() {
+                // Try to init on ANY user interaction - critical for Safari
+                const events = ['touchstart', 'touchend', 'click', 'mousedown', 'keydown'];
+                const handler = () => { this.init(); };
+                events.forEach(evt => {
+                    document.addEventListener(evt, handler, { once: true, passive: true });
+                });
+            }
+
             init() {
-                if (this.initialized && this.ctx && this.ctx.state !== "closed") return true;
+                if (this.initialized) return true;
                 try {
                     const AudioCtx = window.AudioContext || window.webkitAudioContext;
                     if (!AudioCtx) return false;
                     this.ctx = new AudioCtx();
                     this.initialized = true;
-                    if (this.ctx.state === "suspended") this.ctx.resume();
+                    if (this.ctx.state === "suspended") {
+                        this.ctx.resume();
+                    }
+                    // Also try to resume on visibility change
+                    document.addEventListener('visibilitychange', () => {
+                        if (!document.hidden && this.ctx && this.ctx.state === "suspended") {
+                            this.ctx.resume();
+                        }
+                    });
                     return true;
                 } catch (e) { return false; }
             }
+
             ensureRunning() {
                 if (!this.ctx) this.init();
-                if (this.ctx && this.ctx.state === "suspended") this.ctx.resume();
+                if (this.ctx && this.ctx.state === "suspended") {
+                    this.ctx.resume();
+                }
                 return this.ctx && this.ctx.state === "running";
             }
+
+            // FIXED: Very short, quiet beeps that won't interrupt Spotify
             playBeep(freq, dur, vol) {
-                if (!this.ensureRunning()) { this.vibrate(50); return; }
+                // Always vibrate as fallback/primary on mobile
+                this.vibrate(50);
+
+                if (!this.ensureRunning()) return;
+
                 try {
                     const osc = this.ctx.createOscillator();
                     const gain = this.ctx.createGain();
-                    osc.connect(gain); gain.connect(this.ctx.destination);
-                    osc.frequency.value = freq || 880;
-                    gain.gain.setValueAtTime(vol || 0.5, this.ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + (dur || 0.15));
-                    osc.start(this.ctx.currentTime); osc.stop(this.ctx.currentTime + (dur || 0.15));
-                } catch (e) { this.vibrate(50); }
+
+                    // Ultra-short, quiet beep so it doesn't interrupt Spotify
+                    const actualDur = dur || 0.06;
+                    const actualVol = (vol || 0.15) * 0.25;
+
+                    osc.connect(gain); 
+                    gain.connect(this.ctx.destination);
+                    osc.frequency.value = freq || 1400;
+
+                    // Use linear ramp for less audio glitch
+                    gain.gain.setValueAtTime(0, this.ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(actualVol, this.ctx.currentTime + 0.005);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + actualDur);
+
+                    osc.start(this.ctx.currentTime); 
+                    osc.stop(this.ctx.currentTime + actualDur + 0.02);
+                } catch (e) {}
             }
+
             playDone() {
-                if (!this.ensureRunning()) { this.vibrate([100,50,100,50,200]); return; }
+                // Strong vibration pattern as primary notification
+                this.vibrate([100, 50, 100, 50, 200]);
+
+                if (!this.ensureRunning()) return;
+
                 try {
-                    [[0,880],[0.2,1047],[0.4,1319]].forEach(([t,freq]) => {
+                    const now = this.ctx.currentTime;
+                    [0, 0.12].forEach((t, i) => {
                         const osc = this.ctx.createOscillator();
                         const gain = this.ctx.createGain();
-                        osc.connect(gain); gain.connect(this.ctx.destination);
-                        osc.frequency.value = freq;
-                        gain.gain.setValueAtTime(0.5, this.ctx.currentTime + t);
-                        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + t + 0.4);
-                        osc.start(this.ctx.currentTime + t); osc.stop(this.ctx.currentTime + t + 0.45);
+                        osc.connect(gain); 
+                        gain.connect(this.ctx.destination);
+                        osc.frequency.value = i === 0 ? 1400 : 1800;
+
+                        gain.gain.setValueAtTime(0, now + t);
+                        gain.gain.linearRampToValueAtTime(0.08, now + t + 0.005);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + t + 0.15);
+
+                        osc.start(now + t); 
+                        osc.stop(now + t + 0.18);
                     });
-                } catch (e) { this.vibrate([100,50,100,50,200]); }
+                } catch (e) {}
             }
+
             playCountdown(seconds) {
-                if (seconds <= 5) this.playBeep(1047, 0.12, 0.6);
-                else if (seconds <= 10) this.playBeep(880, 0.1, 0.4);
+                if (seconds <= 5) {
+                    this.playBeep(1600, 0.05, 0.2);
+                    this.vibrate(25);
+                } else if (seconds <= 10) {
+                    this.playBeep(1200, 0.04, 0.15);
+                }
             }
-            vibrate(pattern) { if (navigator.vibrate) navigator.vibrate(pattern); }
+
+            vibrate(pattern) { 
+                if (navigator.vibrate) navigator.vibrate(pattern); 
+            }
         }
         const audioManager = new AudioManager();
 
@@ -505,23 +651,46 @@
                 return () => clearInterval(iv);
             }, [timer.active]);
 
+            // ====== FIXED: Background timer that survives lock screen ======
+            const bgTimerRef = useRef(null);
+
+            // Check for running timer on mount (if app was backgrounded)
             useEffect(() => {
-                if (!rest.active) return;
-                restSecondsRef.current = rest.seconds;
-                const iv = setInterval(() => {
-                    restSecondsRef.current -= 1;
-                    const next = restSecondsRef.current;
-                    if (next <= 0) {
-                        clearInterval(iv);
+                const savedActive = localStorage.getItem('wt_timer_active');
+                if (savedActive === 'true') {
+                    const endTime = parseInt(localStorage.getItem('wt_timer_end') || '0');
+                    const duration = parseInt(localStorage.getItem('wt_timer_duration') || String(restDuration));
+                    if (endTime && Date.now() < endTime) {
+                        const remaining = Math.ceil((endTime - Date.now()) / 1000);
+                        setRest({active: true, seconds: remaining});
+                        startBackgroundTimer(remaining, duration);
+                    } else {
+                        localStorage.removeItem('wt_timer_active');
+                        localStorage.removeItem('wt_timer_end');
+                        localStorage.removeItem('wt_timer_duration');
+                    }
+                }
+            }, []);
+
+            const startBackgroundTimer = (seconds, fullDuration) => {
+                if (bgTimerRef.current) {
+                    bgTimerRef.current.stop();
+                }
+
+                bgTimerRef.current = new BackgroundTimer();
+                bgTimerRef.current.start(
+                    seconds,
+                    (remaining) => {
+                        restSecondsRef.current = remaining;
+                        setRest(r => ({...r, seconds: remaining}));
+                        audioManager.playCountdown(remaining);
+                    },
+                    () => {
                         audioManager.playDone();
                         setRest({active: false, seconds: restDuration});
-                        return;
                     }
-                    audioManager.playCountdown(next);
-                    setRest(r => ({...r, seconds: next}));
-                }, 1000);
-                return () => clearInterval(iv);
-            }, [rest.active, restDuration]);
+                );
+            };
 
             const initAudio = () => {
                 const ok = audioManager.init();
@@ -533,6 +702,7 @@
                 audioManager.init();
                 restSecondsRef.current = restDuration;
                 setRest({active: true, seconds: restDuration});
+                startBackgroundTimer(restDuration, restDuration);
             };
 
             const update = (ei, si, field, val) => setData(d => d.map((ex, i) => i !== ei ? ex : {
